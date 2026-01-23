@@ -32,6 +32,12 @@ class EntityExtractor:
         logger.info("Extracting entities from notice text")
 
         entities = self._extract_entities(raw_text)
+
+        # If extraction completely failed, raise an explicit error so the
+        # caller can distinguish system failure from a defective notice.
+        if not entities:
+            raise RuntimeError("LLM entity extraction failed – no data returned")
+
         entities['raw_text'] = raw_text
         entities['notice_type'] = NoticeType.THREE_DAY_PAY
 
@@ -88,6 +94,8 @@ Return ONLY valid JSON."""
             return self.llm_client.complete_json(prompt, system_message)
         except Exception as e:
             logger.error(f"Entity extraction failed: {e}")
+            # Return empty dict – the caller (extract) will turn this into an
+            # explicit RuntimeError so it can be surfaced to the user.
             return {}
 
     def _to_extracted_notice(self, data: Dict[str, Any]) -> ExtractedNotice:

@@ -1,0 +1,58 @@
+{
+  "notice_type": "3_day_pay_or_quit",
+  "defects": [
+    {
+      "defect_id": "MVP-002",
+      "title": "No Service Date",
+      "severity": "major",
+      "description": "Cannot verify 3-day period without service date.",
+      "statute_violated": "CCP 1161(2), 1162",
+      "case_law": [],
+      "tenant_action": "Missing service date is a significant defect.",
+      "evidence": "No service date found"
+    },
+    {
+      "defect_id": "MVP-003",
+      "title": "No Exact Amount Stated",
+      "severity": "critical",
+      "description": "Notice must state specific dollar amount owed.",
+      "statute_violated": "CCP 1161(2); Bevill v. Zoura (1994)",
+      "case_law": [],
+      "tenant_action": "This defect invalidates the notice.",
+      "evidence": "No specific dollar amount found"
+    },
+    {
+      "defect_id": "MVP-004",
+      "title": "Missing Payee Information",
+      "severity": "critical",
+      "description": "Missing: payee name, payment address, telephone number",
+      "statute_violated": "CCP 1161(2); Schwab v. Rondel Homes (1991)",
+      "case_law": [],
+      "tenant_action": "This defect likely invalidates the notice.",
+      "evidence": "Missing: payee name, payment address, telephone number"
+    },
+    {
+      "defect_id": "MVP-005",
+      "title": "Missing Payment Hours",
+      "severity": "critical",
+      "description": "Must state days/hours when payment can be made in person.",
+      "statute_violated": "CCP 1161(2); Schnell v. City of Santa Monica (1978)",
+      "case_law": [],
+      "tenant_action": "This defect invalidates the notice.",
+      "evidence": "In-person payment mentioned but no hours stated"
+    },
+    {
+      "defect_id": "MVP-006",
+      "title": "Incomplete Financial Institution Information",
+      "severity": "critical",
+      "description": "Payment at financial institution requires: institution name, street address, account number, and must be within 5 miles. Missing: street address, account number",
+      "statute_violated": "CCP 1161(2)",
+      "case_law": [],
+      "tenant_action": "This defect likely invalidates the notice.",
+      "evidence": "Financial institution mentioned but missing: street address, account number"
+    }
+  ],
+  "is_valid": false,
+  "summary": "Found 5 issue(s): 4 critical. The notice appears INVALID.",
+  "analysis_date": "2026-01-22"
+}

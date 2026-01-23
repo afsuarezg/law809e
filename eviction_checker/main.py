@@ -28,7 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def analyze_notice(file_path: str) -> DefectReport:
+def analyze_notice(file_path: str, *, extracted_text_path: str | None = None) -> DefectReport:
     """
     Analyze an eviction notice for legal defects.
 
@@ -43,6 +43,15 @@ def analyze_notice(file_path: str) -> DefectReport:
     ocr = OCRProcessor()
     raw_text = ocr.process(file_path)
     logger.info(f"Extracted {len(raw_text)} characters")
+
+    # Optionally save the extracted text for cross-examination/audit
+    if extracted_text_path:
+        try:
+            with open(extracted_text_path, "w", encoding="utf-8") as f:
+                f.write(raw_text)
+            logger.info(f"Extracted text saved to {extracted_text_path}")
+        except Exception as e:
+            logger.warning(f"Could not save extracted text to {extracted_text_path}: {e}")
 
     # Step 2: Extract structured entities
     logger.info("Extracting entities...")
@@ -120,7 +129,21 @@ def main():
     )
     parser.add_argument(
         "--output", "-o",
-        help="Save JSON report to file"
+        help="Save JSON report to file (overrides --report-dir if provided)"
+    )
+    parser.add_argument(
+        "--report-dir",
+        default="reports",
+        help="Directory to save JSON reports (default: reports/)"
+    )
+    parser.add_argument(
+        "--save-text",
+        help="Save extracted raw text to file (overrides --text-dir if provided)"
+    )
+    parser.add_argument(
+        "--text-dir",
+        default="extracted_texts",
+        help="Directory to save extracted raw text (default: extracted_texts/)"
     )
     parser.add_argument(
         "--quiet", "-q",
@@ -135,15 +158,28 @@ def main():
         sys.exit(1)
 
     try:
-        report = analyze_notice(args.file)
+        input_path = Path(args.file)
+        input_stem = input_path.stem
+
+        report_dir = Path(args.report_dir)
+        text_dir = Path(args.text_dir)
+        report_dir.mkdir(parents=True, exist_ok=True)
+        text_dir.mkdir(parents=True, exist_ok=True)
+
+        report_path = Path(args.output) if args.output else (report_dir / f"{input_stem}.json")
+        extracted_text_path = Path(args.save_text) if args.save_text else (text_dir / f"{input_stem}.txt")
+
+        report = analyze_notice(
+            args.file,
+            extracted_text_path=str(extracted_text_path)
+        )
 
         if not args.quiet:
             print_report(report)
 
-        if args.output:
-            with open(args.output, 'w') as f:
-                json.dump(report.model_dump(), f, indent=2, default=str)
-            logger.info(f"Report saved to {args.output}")
+        with open(report_path, 'w', encoding="utf-8") as f:
+            json.dump(report.model_dump(), f, indent=2, default=str)
+        logger.info(f"Report saved to {report_path}")
 
         # Exit with non-zero code if notice is invalid
         sys.exit(0 if report.is_valid else 1)

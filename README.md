@@ -53,8 +53,15 @@ ANTHROPIC_API_KEY=sk-ant-your-key-here
 # Analyze a notice and print results
 python -m eviction_checker.main notice.pdf
 
-# Save report to JSON file
+# Reports and extracted text are saved automatically using the input filename:
+# - reports/<input_name>.json
+# - extracted_texts/<input_name>.txt
+
+# Override where the report is saved
 python -m eviction_checker.main notice.pdf --output report.json
+
+# Override output directories
+python -m eviction_checker.main notice.pdf --report-dir out/reports --text-dir out/text
 
 # Quiet mode (no console output)
 python -m eviction_checker.main notice.pdf -q -o report.json
