@@ -160,9 +160,12 @@ class NoticeGenerator:
 
         # Random rent period (1-3 months back)
         months_back = random.randint(1, 3)
-        period_start = date(base_date.year, base_date.month - months_back + 1, 1)
-        if period_start.month == 0:
-            period_start = date(base_date.year - 1, 12, 1)
+        period_month = base_date.month - months_back
+        period_year = base_date.year
+        while period_month < 1:
+            period_month += 12
+            period_year -= 1
+        period_start = date(period_year, period_month, 1)
         period_end = date(period_start.year, period_start.month, 28)  # Simplified
 
         return NoticeData(
