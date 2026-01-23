@@ -32,18 +32,22 @@ pip install -r requirements.txt
 
 ### Configure API Keys
 
-Copy the example environment file and add your API key:
+Create a `.env` file in the project root and add at least one LLM API key:
 
 ```bash
-cp .env.example .env
+cat > .env <<'EOF'
+OPENAI_API_KEY=sk-your-key-here
+# Optional:
+# OPENAI_MODEL=gpt-4-turbo-preview
+
+# or use Anthropic instead:
+# ANTHROPIC_API_KEY=sk-ant-your-key-here
+# Optional:
+# ANTHROPIC_MODEL=claude-3-opus-20240229
+EOF
 ```
 
-Edit `.env` and add at least one LLM API key:
-```
-OPENAI_API_KEY=sk-your-key-here
-# or
-ANTHROPIC_API_KEY=sk-ant-your-key-here
-```
+Then run the CLI from the project root so the `.env` is picked up.
 
 ## Usage
 
@@ -184,7 +188,7 @@ pytest eviction_checker/tests/
 
 ## Limitations
 
-- Currently focused on 3-Day Pay or Quit notices only
+- Currently focused "on-the-face" defects on 3-Day Pay or Quit notices only
 - Requires LLM API access for entity extraction
 - OCR accuracy depends on document quality
 - This tool provides legal information, not legal advice
