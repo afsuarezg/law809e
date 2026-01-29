@@ -15,6 +15,7 @@ from .models import (
 )
 from .ocr import OCRProcessor
 from .extractor import EntityExtractor
+from .regex_extractor import RegexExtractor
 from .validator import NoticeValidator
 from .main import analyze_notice
 
@@ -23,6 +24,7 @@ __all__ = [
     "analyze_notice",
     "OCRProcessor",
     "EntityExtractor",
+    "RegexExtractor",
     "NoticeValidator",
     "NoticeType",
     "Severity",

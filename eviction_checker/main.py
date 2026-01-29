@@ -4,6 +4,7 @@ Main entry point for eviction notice checker.
 Usage:
     python -m eviction_checker.main <file_path>
     python -m eviction_checker.main notice.pdf --output report.json
+    python -m eviction_checker.main notice.pdf --regex  # Use regex instead of LLM
 """
 
 import argparse
@@ -15,6 +16,7 @@ from pathlib import Path
 
 from .ocr import OCRProcessor
 from .extractor import EntityExtractor
+from .regex_extractor import RegexExtractor
 from .validator import NoticeValidator
 from .models import DefectReport, Severity
 from dotenv import load_dotenv
@@ -28,12 +30,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def analyze_notice(file_path: str, *, extracted_text_path: str | None = None) -> DefectReport:
+def analyze_notice(
+    file_path: str,
+    *,
+    extracted_text_path: str | None = None,
+    use_regex: bool = False
+) -> DefectReport:
     """
     Analyze an eviction notice for legal defects.
 
     Args:
         file_path: Path to PDF or image file
+        extracted_text_path: Optional path to save extracted text
+        use_regex: If True, use regex extraction instead of LLM
 
     Returns:
         DefectReport with analysis results
@@ -54,8 +63,12 @@ def analyze_notice(file_path: str, *, extracted_text_path: str | None = None) ->
             logger.warning(f"Could not save extracted text to {extracted_text_path}: {e}")
 
     # Step 2: Extract structured entities
-    logger.info("Extracting entities...")
-    extractor = EntityExtractor()
+    if use_regex:
+        logger.info("Extracting entities using regex...")
+        extractor = RegexExtractor()
+    else:
+        logger.info("Extracting entities using LLM...")
+        extractor = EntityExtractor()
     notice = extractor.extract(raw_text)
 
     # Step 3: Validate for defects
@@ -150,6 +163,11 @@ def main():
         action="store_true",
         help="Suppress console output"
     )
+    parser.add_argument(
+        "--regex",
+        action="store_true",
+        help="Use regex extraction instead of LLM (faster, no API needed, but less flexible)"
+    )
 
     args = parser.parse_args()
 
@@ -171,7 +189,8 @@ def main():
 
         report = analyze_notice(
             args.file,
-            extracted_text_path=str(extracted_text_path)
+            extracted_text_path=str(extracted_text_path),
+            use_regex=args.regex
         )
 
         if not args.quiet:

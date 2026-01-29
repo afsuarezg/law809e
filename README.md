@@ -30,24 +30,52 @@ sudo apt-get install tesseract-ocr poppler-utils
 pip install -r requirements.txt
 ```
 
-### Configure API Keys
+### Configure LLM
 
-Create a `.env` file in the project root and add at least one LLM API key:
+Choose one of the following options:
+
+#### Option 1: Local LLM with Ollama (Recommended for Privacy)
+
+Your data stays on your machine—no third-party API calls.
+
+```bash
+# Install Ollama
+brew install ollama
+
+# Pull a model (qwen2.5:7b recommended for JSON extraction)
+ollama pull qwen2.5:7b
+
+# Start the server (runs on port 11434)
+ollama serve
+```
+
+Create `.env` file:
+```bash
+echo "OLLAMA_MODEL=qwen2.5:7b" > .env
+```
+
+**Recommended models for Apple Silicon:**
+
+| Model | Size | RAM | Notes |
+|-------|------|-----|-------|
+| `qwen2.5:7b` | 4.7GB | 8GB | Best for JSON extraction |
+| `mistral:7b` | 4.1GB | 8GB | Good general purpose |
+| `llama3.1:8b` | 4.7GB | 8GB | Good balance |
+| `qwen2.5:14b` | 9GB | 16GB | Best quality |
+
+#### Option 2: Cloud APIs
+
+If you prefer cloud APIs (note: data is sent to third parties):
 
 ```bash
 cat > .env <<'EOF'
+# OpenAI
 OPENAI_API_KEY=sk-your-key-here
-# Optional:
-# OPENAI_MODEL=gpt-4-turbo-preview
 
-# or use Anthropic instead:
+# Or Anthropic
 # ANTHROPIC_API_KEY=sk-ant-your-key-here
-# Optional:
-# ANTHROPIC_MODEL=claude-3-opus-20240229
 EOF
 ```
-
-Then run the CLI from the project root so the `.env` is picked up.
 
 ## Usage
 
@@ -56,6 +84,9 @@ Then run the CLI from the project root so the `.env` is picked up.
 ```bash
 # Analyze a notice and print results
 python -m eviction_checker.main notice.pdf
+
+# Use regex extraction instead of LLM (faster, no API needed)
+python -m eviction_checker.main notice.pdf --regex
 
 # Reports and extracted text are saved automatically using the input filename:
 # - reports/<input_name>.json
@@ -70,6 +101,15 @@ python -m eviction_checker.main notice.pdf --report-dir out/reports --text-dir o
 # Quiet mode (no console output)
 python -m eviction_checker.main notice.pdf -q -o report.json
 ```
+
+### Extraction Methods
+
+| Method | Flag | Pros | Cons |
+|--------|------|------|------|
+| **LLM** | (default) | Handles varied formats, understands context | Requires Ollama or API, slower |
+| **Regex** | `--regex` | Instant, free, no dependencies | Less flexible with unusual formats |
+
+Use `--regex` for well-formatted notices or when LLM is unavailable.
 
 ### Python API
 
@@ -169,13 +209,14 @@ Key statutes and case law used for validation:
 
 ```
 eviction_checker/
-├── __init__.py      # Package exports
-├── models.py        # Pydantic data models
-├── ocr.py           # PDF/image text extraction
-├── llm.py           # OpenAI/Anthropic client
-├── extractor.py     # LLM-based entity extraction
-├── validator.py     # Rule-based defect validation
-├── main.py          # CLI entry point
+├── __init__.py        # Package exports
+├── models.py          # Pydantic data models
+├── ocr.py             # PDF/image text extraction
+├── llm.py             # LLM client (Ollama/OpenAI/Anthropic)
+├── extractor.py       # LLM-based entity extraction
+├── regex_extractor.py # Regex-based entity extraction (no LLM needed)
+├── validator.py       # Rule-based defect validation
+├── main.py            # CLI entry point
 └── tests/
     └── test_validator.py
 ```
@@ -188,8 +229,8 @@ pytest eviction_checker/tests/
 
 ## Limitations
 
-- Currently focused "on-the-face" defects on 3-Day Pay or Quit notices only
-- Requires LLM API access for entity extraction
+- Currently focused on "on-the-face" defects on 3-Day Pay or Quit notices only
+- Requires LLM for entity extraction (local Ollama or cloud API)
 - OCR accuracy depends on document quality
 - This tool provides legal information, not legal advice
 
