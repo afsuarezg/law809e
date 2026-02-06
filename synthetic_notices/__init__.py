@@ -8,6 +8,7 @@ Supports both rule-based (conditional logic) and LLM-based generation.
 from .models import NoticeData, GeneratedNotice, DefectType
 from .rule_based_generator import RuleBasedNoticeGenerator
 from .llm_generator import LLMNoticeGenerator
+from .text_notice_generator import TextNoticeGenerator
 
 # Backward compatibility: alias RuleBasedNoticeGenerator as NoticeGenerator
 NoticeGenerator = RuleBasedNoticeGenerator
@@ -17,6 +18,7 @@ __all__ = [
     "NoticeGenerator",  # Backward compatibility alias
     "RuleBasedNoticeGenerator",
     "LLMNoticeGenerator",
+    "TextNoticeGenerator",
     "NoticeData",
     "GeneratedNotice",
     "DefectType",
