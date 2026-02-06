@@ -60,16 +60,21 @@ class NoticeData:
 class GeneratedNotice:
     """A generated notice with metadata."""
     text: str
-    data: NoticeData
+    data: Optional[NoticeData]
     defects: List[DefectType]
     is_valid: bool
 
     def to_dict(self) -> dict:
-        return {
+        result = {
             "text": self.text,
             "defects": [d.value for d in self.defects],
             "is_valid": self.is_valid,
-            "metadata": {
+        }
+        
+        # Add metadata if data is available (rule-based generator)
+        # LLM-generated notices have data=None
+        if self.data is not None:
+            result["metadata"] = {
                 "landlord": self.data.landlord_name,
                 "tenant": self.data.tenant_names,
                 "property": self.data.property_address,
@@ -78,4 +83,7 @@ class GeneratedNotice:
                 "service_date": str(self.data.service_date),
                 "deadline_date": str(self.data.deadline_date),
             }
-        }
+        else:
+            result["metadata"] = None
+        
+        return result

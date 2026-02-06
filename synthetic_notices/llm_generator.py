@@ -7,6 +7,7 @@ Supports multiple LLM providers (OpenAI, Anthropic, etc.).
 
 import os
 import random
+import json
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import date, timedelta
@@ -107,9 +108,10 @@ Property Manager, Coastal Bay Properties, LLC"""
     def generate_valid_notice(self, **kwargs) -> GeneratedNotice:
         """Generate a valid notice using LLM."""
         prompt = self._build_valid_prompt(**kwargs)
-        text = self._call_llm(prompt)
+        response = self._call_llm(prompt)
+        parsed_response = self._parse_json_response(response)
         return GeneratedNotice(
-            text=text,
+            text=parsed_response["notice_text"],
             data=None,  # LLM doesn't return structured data
             defects=[],
             is_valid=True
@@ -122,11 +124,27 @@ Property Manager, Coastal Bay Properties, LLC"""
     ) -> GeneratedNotice:
         """Generate a notice with specific defects using LLM."""
         prompt = self._build_defect_prompt(defects, **kwargs)
-        text = self._call_llm(prompt)
+        response = self._call_llm(prompt)
+        parsed_response = self._parse_json_response(response)
+        
+        # Extract defects from response, fallback to input defects if not present
+        response_defects = parsed_response.get("defects", [])
+        # Convert string defect values back to DefectType enums
+        parsed_defects = []
+        for defect_str in response_defects:
+            try:
+                parsed_defects.append(DefectType(defect_str))
+            except ValueError:
+                # If LLM returns invalid defect type, skip it
+                pass
+        
+        # Use parsed defects if available, otherwise fallback to input defects
+        final_defects = parsed_defects if parsed_defects else defects
+        
         return GeneratedNotice(
-            text=text,
+            text=parsed_response["notice_text"],
             data=None,
-            defects=defects,
+            defects=final_defects,
             is_valid=False
         )
 
@@ -208,7 +226,15 @@ Generate a new valid notice with:
 - Different dates (use current date context)
 - Different payment options (can include personal, bank, or electronic payment)
 
-The notice must be completely valid with no legal defects. Return only the notice text, no additional commentary."""
+The notice must be completely valid with no legal defects.
+
+IMPORTANT: You must return your response as a JSON object with the following structure:
+{{
+  "notice_text": "<the full text of the eviction notice>",
+  "defects": []
+}}
+
+Since this is a valid notice, the defects array should be empty. Return ONLY valid JSON, no additional commentary or markdown formatting."""
 
     def _build_defect_prompt(self, defects: List[DefectType], **kwargs) -> str:
         """Build prompt for defective notice generation."""
@@ -225,6 +251,7 @@ The notice must be completely valid with no legal defects. Return only the notic
         }
         
         defect_list = "\n".join(f"- {defect_descriptions.get(d, d.value)}" for d in defects)
+        defect_values = [d.value for d in defects]
         
         return f"""You are a legal document generator specializing in California eviction notices.
 
@@ -244,7 +271,55 @@ Generate a new notice with:
 - Different dates (use current date context)
 - Different payment options
 
-The notice must contain the specified defect(s) but otherwise follow the format of a real eviction notice. Return only the notice text, no additional commentary."""
+The notice must contain the specified defect(s) but otherwise follow the format of a real eviction notice.
+
+IMPORTANT: You must return your response as a JSON object with the following structure:
+{{
+  "notice_text": "<the full text of the eviction notice>",
+  "defects": {json.dumps(defect_values)}
+}}
+
+The defects array must list the defect types that were specified in the prompt above. Return ONLY valid JSON, no additional commentary or markdown formatting."""
+
+    def _parse_json_response(self, response: str) -> Dict[str, Any]:
+        """
+        Parse JSON response from LLM.
+        
+        Handles cases where LLM might wrap JSON in markdown code blocks or add extra text.
+        """
+        response = response.strip()
+        
+        # Try to extract JSON from markdown code blocks
+        if "```json" in response:
+            start = response.find("```json") + 7
+            end = response.find("```", start)
+            if end != -1:
+                response = response[start:end].strip()
+        elif "```" in response:
+            start = response.find("```") + 3
+            end = response.find("```", start)
+            if end != -1:
+                response = response[start:end].strip()
+        
+        # Try to find JSON object boundaries
+        start_brace = response.find("{")
+        end_brace = response.rfind("}")
+        if start_brace != -1 and end_brace != -1 and end_brace > start_brace:
+            response = response[start_brace:end_brace + 1]
+        
+        try:
+            parsed = json.loads(response)
+            # Validate required keys
+            if "notice_text" not in parsed:
+                raise ValueError("Response missing 'notice_text' key")
+            if "defects" not in parsed:
+                parsed["defects"] = []
+            return parsed
+        except json.JSONDecodeError as e:
+            raise ValueError(
+                f"Failed to parse JSON response from LLM. "
+                f"Response: {response[:200]}... Error: {e}"
+            )
 
     def _call_llm(self, prompt: str) -> str:
         """Call the LLM API."""
@@ -269,15 +344,26 @@ The notice must contain the specified defect(s) but otherwise follow the format 
         
         client = openai.OpenAI(api_key=self.api_key)
         
-        response = client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "You are a legal document generator."},
+        # Check if model supports JSON mode (gpt-4-turbo-preview, gpt-4-1106-preview, gpt-3.5-turbo-1106, etc.)
+        json_mode_models = ["gpt-4-turbo", "gpt-4-turbo-preview", "gpt-4-1106-preview", 
+                           "gpt-3.5-turbo-1106", "gpt-4o", "gpt-4o-mini", "o1", "o1-mini"]
+        use_json_mode = any(model_name in self.model.lower() for model_name in json_mode_models)
+        
+        kwargs = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": "You are a legal document generator. Always return valid JSON responses."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7,
-            max_tokens=2000
-        )
+            "temperature": 0.7,
+            "max_tokens": 2000
+        }
+        
+        # Add response_format for models that support it
+        if use_json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        
+        response = client.chat.completions.create(**kwargs)
         
         return response.choices[0].message.content.strip()
 
@@ -297,6 +383,7 @@ The notice must contain the specified defect(s) but otherwise follow the format 
             model=self.model,
             max_tokens=2000,
             temperature=0.7,
+            system="You are a legal document generator. Always return valid JSON responses.",
             messages=[
                 {"role": "user", "content": prompt}
             ]
@@ -315,7 +402,13 @@ The notice must contain the specified defect(s) but otherwise follow the format 
             raise ValueError("Google API key not provided. Set GOOGLE_API_KEY environment variable or pass api_key parameter.")
         
         genai.configure(api_key=self.api_key)
-        model = genai.GenerativeModel(self.model)
+        
+        # Add system instruction for JSON output
+        system_instruction = "You are a legal document generator. Always return valid JSON responses."
+        model = genai.GenerativeModel(
+            self.model,
+            system_instruction=system_instruction
+        )
         
         response = model.generate_content(
             prompt,
