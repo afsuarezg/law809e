@@ -145,21 +145,37 @@ Property Manager, Coastal Bay Properties, LLC"""
         count: int,
         valid_ratio: float = 0.3,
         max_defects_per_notice: int = 3,
+        progress_callback=None,
         **kwargs
     ) -> List[GeneratedNotice]:
-        """Generate a batch of notices."""
+        """
+        Generate a batch of notices.
+        
+        Args:
+            count: Total number of notices to generate
+            valid_ratio: Ratio of valid notices
+            max_defects_per_notice: Maximum defects per invalid notice
+            progress_callback: Optional callback function(notice, index, total) called after each notice
+            **kwargs: Additional arguments passed to generation methods
+        """
         notices = []
         num_valid = int(count * valid_ratio)
         num_invalid = count - num_valid
 
         # Generate valid notices
-        for _ in range(num_valid):
-            notices.append(self.generate_valid_notice(**kwargs))
+        for i in range(num_valid):
+            notice = self.generate_valid_notice(**kwargs)
+            notices.append(notice)
+            if progress_callback:
+                progress_callback(notice, len(notices), count)
 
         # Generate invalid notices
-        for _ in range(num_invalid):
+        for i in range(num_invalid):
             num_defects = random.randint(1, max_defects_per_notice)
-            notices.append(self.generate_random_invalid_notice(num_defects, **kwargs))
+            notice = self.generate_random_invalid_notice(num_defects, **kwargs)
+            notices.append(notice)
+            if progress_callback:
+                progress_callback(notice, len(notices), count)
 
         random.shuffle(notices)
         return notices
