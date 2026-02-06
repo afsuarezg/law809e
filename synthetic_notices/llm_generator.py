@@ -11,6 +11,20 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import date, timedelta
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load .env file from project root (two levels up from this file)
+    env_path = Path(__file__).parent.parent.parent / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
+    else:
+        # Fallback: try loading from current directory
+        load_dotenv()
+except ImportError:
+    # python-dotenv not installed, will use system environment variables only
+    pass
+
 from .models import GeneratedNotice, DefectType, NoticeData
 
 
