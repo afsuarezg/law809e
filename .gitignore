@@ -43,3 +43,19 @@ Thumbs.db
 # Project specific
 output/
 *.log
+
+#executables
+*.exe
+*.app
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.tar
+*.zip
+*.7z
+*.rar
+*.iso
+*.img
+
+*.ps1
