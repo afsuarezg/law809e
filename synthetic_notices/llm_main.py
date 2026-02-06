@@ -1,10 +1,10 @@
 """
-CLI for generating synthetic eviction notices.
+CLI for generating synthetic eviction notices using LLMs.
 
 Usage:
-    python -m synthetic_notices.main --count 100 --valid-ratio 0.3 --output dataset.json
-    python -m synthetic_notices.main --defect not_disjunctive --output single.json
-    python -m synthetic_notices.main --valid --output valid_notice.txt
+    python -m synthetic_notices.llm_main --count 100 --valid-ratio 0.3 --output dataset.json
+    python -m synthetic_notices.llm_main --defect not_disjunctive --output single.json --provider openai
+    python -m synthetic_notices.llm_main --valid --output valid_notice.txt --provider anthropic --model claude-3-opus-20240229
 """
 
 import argparse
@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import List
 
 from .models import DefectType, GeneratedNotice
-from .generator import NoticeGenerator
+from .llm_generator import LLMNoticeGenerator
 
 
 def save_notices(notices: List[GeneratedNotice], output_path: Path, format: str = "json"):
@@ -52,11 +52,11 @@ def save_notices(notices: List[GeneratedNotice], output_path: Path, format: str 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate synthetic California eviction notices."
+        description="Generate synthetic California eviction notices using LLMs."
     )
 
     # Generation mode
-    mode_group = parser.add_mutually_exclusive_group()
+    mode_group = parser.add_mutually_exclusive_group(required=True)
     mode_group.add_argument(
         "--valid",
         action="store_true",
@@ -89,11 +89,30 @@ def main():
         help="Max defects per invalid notice (default: 3)"
     )
 
+    # LLM options
+    parser.add_argument(
+        "--provider",
+        type=str,
+        choices=["openai", "anthropic", "google"],
+        default="openai",
+        help="LLM provider (default: openai)"
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        help="Model name (default: provider-specific default)"
+    )
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        help="API key (if not provided, reads from environment)"
+    )
+
     # Output options
     parser.add_argument(
         "--output", "-o",
         type=str,
-        default="output/notices.json",
+        required=True,
         help="Output file path"
     )
     parser.add_argument(
@@ -127,33 +146,45 @@ def main():
         return
 
     # Initialize generator
-    generator = NoticeGenerator(seed=args.seed)
+    try:
+        generator = LLMNoticeGenerator(
+            provider=args.provider,
+            model=args.model,
+            api_key=args.api_key,
+            seed=args.seed
+        )
+    except Exception as e:
+        print(f"Error initializing LLM generator: {e}", file=sys.stderr)
+        sys.exit(1)
+
     notices = []
 
     # Generate based on mode
-    if args.valid:
-        notices = [generator.generate_valid_notice()]
-        print("Generated 1 valid notice")
+    try:
+        if args.valid:
+            print("Generating valid notice...")
+            notices = [generator.generate_valid_notice()]
+            print("Generated 1 valid notice")
 
-    elif args.defect:
-        defects = [DefectType(d) for d in args.defect]
-        notices = [generator.generate_invalid_notice(defects)]
-        print(f"Generated 1 notice with defects: {', '.join(args.defect)}")
+        elif args.defect:
+            defects = [DefectType(d) for d in args.defect]
+            print(f"Generating notice with defects: {', '.join(args.defect)}...")
+            notices = [generator.generate_invalid_notice(defects)]
+            print(f"Generated 1 notice with defects: {', '.join(args.defect)}")
 
-    elif args.count:
-        notices = generator.generate_batch(
-            count=args.count,
-            valid_ratio=args.valid_ratio,
-            max_defects_per_notice=args.max_defects
-        )
-        valid_count = sum(1 for n in notices if n.is_valid)
-        print(f"Generated {args.count} notices ({valid_count} valid, {args.count - valid_count} invalid)")
+        elif args.count:
+            print(f"Generating {args.count} notices...")
+            notices = generator.generate_batch(
+                count=args.count,
+                valid_ratio=args.valid_ratio,
+                max_defects_per_notice=args.max_defects
+            )
+            valid_count = sum(1 for n in notices if n.is_valid)
+            print(f"Generated {args.count} notices ({valid_count} valid, {args.count - valid_count} invalid)")
 
-    else:
-        # Default: generate one random invalid notice
-        notices = [generator.generate_random_invalid_notice()]
-        defect_names = ", ".join(d.value for d in notices[0].defects)
-        print(f"Generated 1 invalid notice with defects: {defect_names}")
+    except Exception as e:
+        print(f"Error generating notices: {e}", file=sys.stderr)
+        sys.exit(1)
 
     # Save output
     output_path = Path(args.output)

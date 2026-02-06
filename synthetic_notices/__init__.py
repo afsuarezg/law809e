@@ -2,14 +2,21 @@
 Synthetic Eviction Notice Generator
 
 Generates valid and invalid California 3-Day Notices for testing and training.
+Supports both rule-based (conditional logic) and LLM-based generation.
 """
 
 from .models import NoticeData, GeneratedNotice, DefectType
-from .generator import NoticeGenerator
+from .rule_based_generator import RuleBasedNoticeGenerator
+from .llm_generator import LLMNoticeGenerator
 
-__version__ = "1.0.0"
+# Backward compatibility: alias RuleBasedNoticeGenerator as NoticeGenerator
+NoticeGenerator = RuleBasedNoticeGenerator
+
+__version__ = "2.0.0"
 __all__ = [
-    "NoticeGenerator",
+    "NoticeGenerator",  # Backward compatibility alias
+    "RuleBasedNoticeGenerator",
+    "LLMNoticeGenerator",
     "NoticeData",
     "GeneratedNotice",
     "DefectType",

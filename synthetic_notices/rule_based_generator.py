@@ -1,7 +1,7 @@
 """
-Synthetic eviction notice generator.
+Rule-based synthetic eviction notice generator.
 
-Generates valid and invalid 3-day notices with configurable defects.
+Generates valid and invalid 3-day notices with configurable defects using conditional logic.
 """
 
 import random
@@ -76,8 +76,8 @@ SAMPLE_BANKS = [
 ELECTRONIC_METHODS = ["Zelle", "Venmo", "PayPal", "direct ACH transfer", "wire transfer"]
 
 
-class NoticeGenerator:
-    """Generates synthetic eviction notices."""
+class RuleBasedNoticeGenerator:
+    """Generates synthetic eviction notices using rule-based conditional logic."""
 
     def __init__(self, seed: Optional[int] = None):
         """Initialize generator with optional random seed."""
