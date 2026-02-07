@@ -8,8 +8,20 @@ This script:
 4. Generates a validation report
 
 Usage:
+    # Use LLM extraction (default) and print results
     python validate_synthetic_notices.py synthetic_notices/output/LLM_generated/batch_10_notices.json
+    
+    # Use regex extraction (faster, no API needed)
+    python validate_synthetic_notices.py synthetic_notices/output/LLM_generated/batch_10_notices.json --regex
+    
+    # Print only, don't save report
+    python validate_synthetic_notices.py synthetic_notices/output/LLM_generated/batch_10_notices.json --print-only
+    
+    # Save detailed report
     python validate_synthetic_notices.py synthetic_notices/output/LLM_generated/batch_10_notices.json --output validation_report.json
+    
+    # Using uv
+    uv run python validate_synthetic_notices.py synthetic_notices/output/LLM_generated/batch_10_notices.json --regex --print-only
 """
 
 import argparse
@@ -20,10 +32,22 @@ from typing import List, Dict, Any
 from collections import defaultdict
 
 # Import directly to avoid importing OCRProcessor (which requires pytesseract)
-from eviction_checker.extractor import EntityExtractor
-from eviction_checker.regex_extractor import RegexExtractor
-from eviction_checker.validator import NoticeValidator
-from eviction_checker.models import DefectReport, Severity
+# Note: This still imports __init__.py, but we handle the error gracefully
+try:
+    from eviction_checker.extractor import EntityExtractor
+    from eviction_checker.regex_extractor import RegexExtractor
+    from eviction_checker.validator import NoticeValidator
+    from eviction_checker.models import DefectReport, Severity
+except ModuleNotFoundError as e:
+    if 'pytesseract' in str(e) or 'ocr' in str(e).lower():
+        print("Error: Missing dependencies. Please ensure you're using the virtual environment.", file=sys.stderr)
+        print("\nTo fix:", file=sys.stderr)
+        print("  1. Activate venv: .\\.venv\\Scripts\\Activate.ps1", file=sys.stderr)
+        print("  2. Or use uv: uv run python validate_synthetic_notices.py ...", file=sys.stderr)
+        print("  3. Or use venv Python: .\\.venv\\Scripts\\python.exe validate_synthetic_notices.py ...", file=sys.stderr)
+        sys.exit(1)
+    raise
+
 from synthetic_notices.models import DefectType
 
 
@@ -130,7 +154,7 @@ def validate_batch(
     Args:
         json_file_path: Path to JSON file with synthetic notices
         use_regex: If True, use regex extraction instead of LLM
-        output_path: Optional path to save validation report
+        output_path: Optional path to save validation report (None = print only)
         
     Returns:
         Dictionary with validation results for all notices
@@ -144,7 +168,11 @@ def validate_batch(
         raise ValueError("No notices found in JSON file")
     
     print(f"Validating {len(notices)} notices...")
-    print(f"Using {'regex' if use_regex else 'LLM'} extraction\n")
+    print(f"Using {'regex' if use_regex else 'LLM'} extraction")
+    if not use_regex:
+        print("Note: LLM extraction requires API access (OpenAI, Anthropic, or Ollama)\n")
+    else:
+        print()
     
     results = []
     for i, notice in enumerate(notices, 1):
@@ -220,7 +248,7 @@ def validate_batch(
     if output_path:
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(report, f, indent=2, default=str)
-        print(f"Validation report saved to {output_path}")
+        print(f"Validation report saved to {output_path}\n")
     
     return report
 
@@ -258,7 +286,25 @@ def print_summary(report: Dict[str, Any]):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate synthetic eviction notices using the eviction checker."
+        description="Validate synthetic eviction notices using the eviction checker.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Use LLM extraction (default) and print results
+  python validate_synthetic_notices.py batch_10_notices.json
+  
+  # Use regex extraction (faster, no API)
+  python validate_synthetic_notices.py batch_10_notices.json --regex
+  
+  # Print only, don't save report
+  python validate_synthetic_notices.py batch_10_notices.json --print-only
+  
+  # Save report to file
+  python validate_synthetic_notices.py batch_10_notices.json --output report.json
+  
+  # Using uv
+  uv run python validate_synthetic_notices.py batch_10_notices.json --regex --print-only
+        """
     )
     parser.add_argument(
         "json_file",
@@ -266,17 +312,22 @@ def main():
     )
     parser.add_argument(
         "--output", "-o",
-        help="Path to save validation report JSON (default: validation_report.json)"
+        help="Path to save validation report JSON (optional, use --print-only to skip saving)"
     )
     parser.add_argument(
         "--regex",
         action="store_true",
-        help="Use regex extraction instead of LLM (faster, no API needed)"
+        help="Use regex extraction instead of LLM (faster, no API needed). Default: uses LLM"
+    )
+    parser.add_argument(
+        "--print-only",
+        action="store_true",
+        help="Print results only, don't save report to file"
     )
     parser.add_argument(
         "--quiet", "-q",
         action="store_true",
-        help="Suppress detailed output"
+        help="Suppress detailed output (only show errors)"
     )
     
     args = parser.parse_args()
@@ -285,7 +336,11 @@ def main():
         print(f"Error: File not found: {args.json_file}", file=sys.stderr)
         sys.exit(1)
     
-    output_path = args.output or "validation_report.json"
+    # Determine output path
+    if args.print_only:
+        output_path = None  # Don't save
+    else:
+        output_path = args.output or "validation_report.json"
     
     try:
         report = validate_batch(
@@ -316,6 +371,8 @@ def main():
         
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
