@@ -209,15 +209,17 @@ REQUIRED ELEMENTS FOR A VALID NOTICE:
 2. Amount stated: Must specify the exact dollar amount of rent owed
 3. Rent period: Must specify the period for which rent is due (cannot be more than 12 months old)
 4. Three business days: Must give at least 3 business days (excluding weekends and holidays)
-5. Payee information: Must include landlord name, address, and phone number
-6. Payment hours: If in-person payment is allowed, must specify business hours
-7. Financial institution: If bank payment is allowed, must include complete bank info and 5-mile statement
+5. Payee information: Must include the exact name, exact street address (not just city/state), and exact phone number of the payee. Generic references like "property management office" without a specific address are insufficient.
+6. Payment hours: If in-person payment is allowed, must specify exact business hours (e.g., "Monday through Friday, 9:00 AM to 5:00 PM"). Generic statements like "normal business hours" or "during business hours" are NOT sufficient and do not meet this requirement.
+7. Financial institution: If bank payment is allowed, must include the financial institution's exact name, exact street address, and exact account number. Must also include the 5-mile statement.
 8. Electronic payment: If electronic payment is allowed, must state it was "previously established"
 9. Forfeiture declaration: Must include notice of forfeiture
 
 Use the following sample notice as a reference for format and style:
 
 {self.sample_template}
+
+NOTE: The structure of your generated notice can diverge from the structure of the sample template above. You may organize the information differently, use different section headings, or arrange the content in a different order, as long as all required elements are present and clearly stated.
 
 Generate a new valid notice with:
 - Different tenant name(s) and address

@@ -1,0 +1,85 @@
+{
+  "notices": [
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: November 1, 2022\nTo:\nJohn Doe\n7890 Ocean Side Lane, Apt. 15\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\n2500 Sunset Blvd, Suite 500\nLos Angeles, CA 90026\n(213) 555-1234\n\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\n$2,500.00\n\nThis amount represents rent due for the month of October 2022, including applicable late fees as permitted under your rental agreement.\n\nWITHIN THREE (3) BUSINESS DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\n\n1. PAY the total amount of rent stated above, OR\n2. QUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\n\nPayment must be made by personal check, or deposited directly into the account of Sunset Properties, Inc. at City Bank, 5000 Sunset Blvd, Los Angeles, CA 90027, Account No. 1234567890. Payments at the bank must be made within five miles of your rental property. Electronic payment is also allowed as it was previously established.\n\nPayment hours are from Monday through Friday, 9:00 AM to 5:00 PM.\n\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, forfeiture of the rental agreement, and the filing of an unlawful detainer (eviction) action against you.\n\nLandlord / Agent Signature:\nProperty Manager, Sunset Properties, Inc.",
+      "defects": [],
+      "is_valid": true,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\n\nDate: December 1, 2022\n\nTo:\nJohn Doe\n5678 Ocean Front Walk, Apt. 5\nSanta Monica, CA 90401\n\nFrom:\nGolden State Realty, Inc.\n1832 Sunset Boulevard, Suite 400\nLos Angeles, CA 90027\nPhone: (213) 555-0198\n\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises located at 5678 Ocean Front Walk, Apt. 5, Santa Monica, CA 90401. The total amount of rent due and unpaid is:\n$2,500.00\n\nThis amount represents rent due for the month of November 2022.\n\nWITHIN THREE (3) BUSINESS DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\n\n1. PAY the total amount of rent stated above in full, OR\n2. QUIT AND DELIVER UP POSSESSION of the premises to Golden State Realty, Inc.\n\nPayment must be made by personal check or money order payable to Golden State Realty, Inc., and delivered to 1832 Sunset Boulevard, Suite 400, Los Angeles, CA 90027 during the hours of Monday through Friday, 9:00 AM to 5:00 PM.\n\nElectronic payment is also allowed as it was previously established.\n\nFAILURE TO COMPLY with this notice within the time stated will result in forfeiture of the lease/rental agreement and initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\n\nLandlord / Agent Signature:\n\nProperty Manager, Golden State Realty, Inc.",
+      "defects": [],
+      "is_valid": true,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: November 24, 2022\nTo:\nJohn Doe\n5678 Ocean View Lane, Apt. 5\nLos Angeles, CA 90001\nFrom:\nSunset Realty, Inc.\n12345 Sunset Blvd, Suite 678\nLos Angeles, CA 90001\nPhone: (310) 123-4567\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises located at the above address. The total amount of rent due and unpaid is:\n$2,500.00\nThis amount represents rent due for the month of October 2022.\nWITHIN THREE (3) BUSINESS DAYS commencing the day after the date of this notice, you must either:\nPAY the total amount of rent stated above in full, OR\nQUIT AND DELIVER UP POSSESSION of the premises to Sunset Realty, Inc.\nPayment must be made by personal check payable to Sunset Realty, Inc., and delivered to the address stated above during specified business hours, Monday through Friday, 9:00 AM to 5:00 PM.\nYou may also pay by direct deposit to our bank account at Bank of California, located at 7890 California St, Los Angeles, CA 90001, Account Number: 1234567890. Please note you have the right to make the rent payment at the financial institution within 5 miles of your rental unit.\nElectronic payment, as previously established, is also permitted.\nFAILURE TO COMPLY with this notice within the time stated will result in forfeiture of your rental agreement and the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\nLandlord / Agent Signature:\nProperty Manager, Sunset Realty, Inc.",
+      "defects": [],
+      "is_valid": true,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: January 7, 2023\nTo:\nJohn Doe\n6789 Palm Tree Lane, Apt. 5\nLos Angeles, CA 90001\nFrom:\nSunset Apartments, LLC\nc/o Property Management Office\nLos Angeles, CA\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\nNot specified\nThis amount represents rent due for the month of December 2022, including applicable late fees as permitted under your rental agreement.\nWITHIN THREE (3) DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\nPAY the total amount of rent stated above in full, OR\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\nPayment must be made by certified check, cashier's check, money order, or electronic transfer payable to Sunset Apartments, LLC, and delivered to the property management office.\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\nLandlord / Agent Signature:\nProperty Manager, Sunset Apartments, LLC",
+      "defects": [
+        "electronic_payment_not_established",
+        "no_amount_stated",
+        "missing_payment_hours"
+      ],
+      "is_valid": false,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\n\nDate: January 20, 2022\n\nTo:\n\nJohn Doe\n\n7890 Ocean Front Blvd, Apt. 10\n\nLos Angeles, CA 90001\n\nFrom:\n\n\n\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\n\n$2,500.00\n\nThis amount represents rent due for the month of December 2021, including applicable late fees as permitted under your rental agreement.\n\nWITHIN THREE (3) DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\n\nPAY the total amount of rent stated above in full, OR\n\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\n\nPayment must be made by bank transfer or credit card.\n\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\n\nLandlord / Agent Signature: \n\n",
+      "defects": [
+        "missing_payee_info"
+      ],
+      "is_valid": false,
+      "metadata": null
+    },
+    {
+      "text": "1-DAY NOTICE TO PAY RENT OR QUIT\nDate: December 31, 2022\nTo:\nJohn Doe\n5678 Ocean View Lane, Apt. 12\nLos Angeles, CA 90001\nFrom:\nBlue Wave Realty, Inc.\nc/o Property Management Office\nLos Angeles, CA\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\nOutstanding Rent Amount\nThis amount represents rent due for the month of December 2022, including applicable late fees as permitted under your rental agreement.\nWITHIN ONE (1) DAY, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\nPAY the total amount of rent stated above in full, OR\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\nPayment must be made by credit card, debit card, or bank transfer to Blue Wave Realty, Inc., and delivered to the property management office during normal business hours.\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\nLandlord / Agent Signature: \nProperty Manager, Blue Wave Realty, Inc.",
+      "defects": [
+        "insufficient_period",
+        "no_amount_stated"
+      ],
+      "is_valid": false,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: February 10, 2023\nTo:\nJosephine Baker\n5678 Ocean View Lane, Apt. 12\nLos Angeles, CA 90001\nFrom:\nSunset Boulevard Realty, Inc.\nc/o Property Management Office\nLos Angeles, CA\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\n$2,500.00\nThis amount represents rent due for the month of January 2023, including applicable late fees as permitted under your rental agreement.\nWITHIN THREE (3) DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\nPAY the total amount of rent stated above in full, OR\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\nPayment must be made by bank transfer, direct deposit, or digital payment apps like Venmo or PayPal to Sunset Boulevard Realty, Inc., and confirmed by the property management office during normal business hours.\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\nLandlord / Agent Signature:\nProperty Manager, Sunset Boulevard Realty, Inc.",
+      "defects": [
+        "no_forfeiture"
+      ],
+      "is_valid": false,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: November 16, 2022\nTo:\nJohn Doe\n5678 Sunset Boulevard, Apt. 3\nLos Angeles, CA 90028\nFrom:\nSunrise Realty, Inc.\nc/o Property Management Office\nLos Angeles, CA\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\n$2,500.00\nThis amount represents rent due for the month of October 2022, including applicable late fees as permitted under your rental agreement.\nWITHIN THREE (3) DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\nPAY the total amount of rent stated above in full, OR\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\nPayment must be made by certified check, cashier's check, or by bank transfer payable to Sunrise Realty, Inc., and delivered to the property management office during normal business hours.\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\nLandlord / Agent Signature:\nProperty Manager, Sunrise Realty, Inc.",
+      "defects": [
+        "financial_institution_incomplete"
+      ],
+      "is_valid": false,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\n\nDate: January 25, 2023\n\nTo:\nJohn Doe\n5678 Ocean Breeze Lane, Apt. 12\nLos Angeles, CA 90001\n\nFrom:\nSunset Realty, Inc.\nc/o Property Management Office\nLos Angeles, CA\n\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\n\nThis amount represents rent due for the month of December 2022, including applicable late fees as permitted under your rental agreement.\n\nWITHIN THREE (3) DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\n\nPAY the total amount of rent stated above in full, OR\n\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\n\nPayment must be made by cash, debit or credit card, or bank transfer payable to Sunset Realty, Inc., and delivered to the property management office.\n\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\n\nLandlord / Agent Signature:\n\nProperty Manager, Sunset Realty, Inc.",
+      "defects": [
+        "missing_payment_hours",
+        "no_amount_stated"
+      ],
+      "is_valid": false,
+      "metadata": null
+    },
+    {
+      "text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: December 13, 2022\nTo:\nJohn Doe\n5678 Ocean View Drive, Apt. 3\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\nc/o Property Management Office\nLos Angeles, CA\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent for the premises described above. The total amount of rent due and unpaid is:\n$2,500.00\nThis amount represents rent due for the month of November 2022, including applicable late fees as permitted under your rental agreement.\nWITHIN THREE (3) DAYS, excluding Saturdays, Sundays, and judicial holidays, after service of this notice, you must either:\nPAY the total amount of rent stated above in full, OR\nQUIT AND DELIVER UP POSSESSION of the premises to the undersigned.\nPayment must be made by certified check, cashier's check, or money order payable to Sunset Properties, Inc., and delivered in-person to the property management office.\nFAILURE TO COMPLY with this notice within the time stated will result in the initiation of legal proceedings to recover possession of the premises, including the filing of an unlawful detainer (eviction) action against you.\nLandlord / Agent Signature: \nProperty Manager, Sunset Properties, Inc.",
+      "defects": [
+        "missing_payment_hours"
+      ],
+      "is_valid": false,
+      "metadata": null
+    }
+  ],
+  "count": 10,
+  "valid_count": 3,
+  "invalid_count": 7
+}
