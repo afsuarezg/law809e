@@ -362,12 +362,13 @@ Examples:
                 print("\n" + "-" * 70)
                 print("SAMPLE INCORRECT VALIDATIONS")
                 print("-" * 70)
-                for result in incorrect[:5]:  # Show first 5
+                for result in incorrect:  # Show first 5
                     print(f"\nNotice {result['notice_index']}:")
                     print(f"  Expected defects: {result.get('expected_defects', [])}")
                     print(f"  Detected defects: {[d['defect_id'] for d in result.get('detected_defects', [])]}")
-                    print(f"  False positives: {result.get('false_positives', [])}")
-                    print(f"  False negatives: {result.get('false_negatives', [])}")
+                    print(f"  True positives (correctly detected): {result.get('true_positives', [])}")
+                    print(f"  False positives (detected but not expected): {result.get('false_positives', [])}")
+                    print(f"  False negatives (expected but not detected): {result.get('false_negatives', [])}")
         
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

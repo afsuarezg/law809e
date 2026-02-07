@@ -1,0 +1,1178 @@
+{
+  "summary": {
+    "total_notices": 20,
+    "correct_validations": 0,
+    "incorrect_validations": 20,
+    "errors": 0,
+    "accuracy": 0.0,
+    "average_precision": 0.18916666666666665,
+    "average_recall": 0.8083333333333332,
+    "f1_score": 0.30658590921748813
+  },
+  "defect_statistics": {
+    "MVP-006": {
+      "true_positives": 5,
+      "false_positives": 3,
+      "false_negatives": 0,
+      "precision": 0.625,
+      "recall": 1.0
+    },
+    "MVP-003": {
+      "true_positives": 3,
+      "false_positives": 8,
+      "false_negatives": 0,
+      "precision": 0.2727272727272727,
+      "recall": 1.0
+    },
+    "MVP-002": {
+      "true_positives": 2,
+      "false_positives": 18,
+      "false_negatives": 0,
+      "precision": 0.1,
+      "recall": 1.0
+    },
+    "MVP-004": {
+      "true_positives": 3,
+      "false_positives": 17,
+      "false_negatives": 0,
+      "precision": 0.15,
+      "recall": 1.0
+    },
+    "MVP-009": {
+      "true_positives": 0,
+      "false_positives": 19,
+      "false_negatives": 0,
+      "precision": 0.0,
+      "recall": 0
+    },
+    "MVP-001": {
+      "true_positives": 3,
+      "false_positives": 1,
+      "false_negatives": 0,
+      "precision": 0.75,
+      "recall": 1.0
+    },
+    "MVP-008": {
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    "MVP-005": {
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 3,
+      "precision": 0,
+      "recall": 0.0
+    },
+    "MVP-007": {
+      "true_positives": 0,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    }
+  },
+  "notices": [
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: March 5, 2023\nTo:\nJohn Doe\n5678 Pacific View Street, Apt. 5\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\n12345 Beverly Hills Drive\nLos Angeles, CA\nPhone: ...",
+      "expected_defects": [],
+      "expected_defect_ids": [],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-003",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-006",
+        "MVP-003",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": true,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 1.0,
+      "notice_index": 1
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: December 1, 2023\nTo:\nJohn Doe\n5678 Ocean Front Walk, Apt. 2\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\nc/o Property Management Office\nLos Angeles, CA\nYO...",
+      "expected_defects": [],
+      "expected_defect_ids": [],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-003",
+        "MVP-009",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-003",
+        "MVP-009",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": true,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 1.0,
+      "notice_index": 2
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: April 30, 2022\nTo:\nJohn Doe\n789 Pacific Coast Highway, Apt. 202\nLos Angeles, CA 90028\nFrom:\nGolden State Properties, LLC\nc/o Property Management Office\nLos Angel...",
+      "expected_defects": [],
+      "expected_defect_ids": [],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-003",
+        "MVP-009",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-003",
+        "MVP-009",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": true,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 1.0,
+      "notice_index": 3
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: February 22, 2023\nTo:\nJohn Smith\n789 Ocean Breeze Lane, Apt. 12\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\nc/o Property Management Office\nLos Angeles, C...",
+      "expected_defects": [],
+      "expected_defect_ids": [],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-002",
+        "MVP-004",
+        "MVP-009",
+        "MVP-003"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-006",
+        "MVP-009",
+        "MVP-002",
+        "MVP-003",
+        "MVP-004"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": true,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 1.0,
+      "notice_index": 4
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: August 19, 2022\nTo:\nJohn Smith\n7890 Pacific Heights Blvd, Apt. 3B\nSan Francisco, CA 94103\nFrom:\nSunset Realty Solutions, LLC\nc/o Property Management Office\nSan F...",
+      "expected_defects": [],
+      "expected_defect_ids": [],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": true,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 1.0,
+      "notice_index": 5
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: September 27, 2022\nTo:\nJohn Doe\n5678 Ocean Breeze Lane, Apt. 5\nLos Angeles, CA 90001\nFrom:\nPacific Heights Properties, Inc.\nc/o Property Management Office\nLos An...",
+      "expected_defects": [],
+      "expected_defect_ids": [],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-006",
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": true,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 1.0,
+      "notice_index": 6
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT AND QUIT\nDate: December 1, 2022\nTo:\nJohn Doe\n5678 Oceanview Terrace, Apt. 10\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\nc/o Main Office\nLos Angeles, CA\nYOU ARE HEREBY...",
+      "expected_defects": [
+        "not_disjunctive"
+      ],
+      "expected_defect_ids": [
+        "MVP-001"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-001",
+          "title": "Notice Not Phrased in the Disjunctive",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-002",
+        "MVP-004",
+        "MVP-001",
+        "MVP-009",
+        "MVP-003"
+      ],
+      "true_positives": [
+        "MVP-001"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002",
+        "MVP-003"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.2,
+      "recall": 1.0,
+      "notice_index": 7
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: January 10, 2023\nTo:\nJohn Doe\n5678 Pacific Terrace, Apt. 3\nSan Francisco, CA 94016\nFrom:\nGolden Gate Estates, LLC\nc/o Property Management Office\nSan Francisco, C...",
+      "expected_defects": [
+        "rent_over_one_year",
+        "financial_institution_incomplete"
+      ],
+      "expected_defect_ids": [
+        "MVP-006",
+        "MVP-008"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-008",
+          "title": "Rent Over One Year Old",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-002",
+        "MVP-004",
+        "MVP-008",
+        "MVP-009"
+      ],
+      "true_positives": [
+        "MVP-006",
+        "MVP-008"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.4,
+      "recall": 1.0,
+      "notice_index": 8
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT AND QUIT\nDate: January 11, 2023\nTo:\nJohn Doe\n5678 Ocean Breeze Lane, Apt. 12\nLos Angeles, CA 90001\nFrom:\nSunset Properties Inc.\nc/o Property Management Office\nLos Angeles, CA\n...",
+      "expected_defects": [
+        "not_disjunctive",
+        "rent_over_one_year"
+      ],
+      "expected_defect_ids": [
+        "MVP-008",
+        "MVP-001"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-001",
+          "title": "Notice Not Phrased in the Disjunctive",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-002",
+        "MVP-004",
+        "MVP-001",
+        "MVP-009",
+        "MVP-003"
+      ],
+      "true_positives": [
+        "MVP-001"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002",
+        "MVP-003"
+      ],
+      "false_negatives": [
+        "MVP-008"
+      ],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.2,
+      "recall": 0.5,
+      "notice_index": 9
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: March 18, 2023\nTo:\nJohn Doe\n7890 Ocean View Lane, Apt. 5\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\nc/o Rental Office\nLos Angeles, CA\nYOU ARE HEREBY NOT...",
+      "expected_defects": [
+        "rent_over_one_year",
+        "missing_payment_hours"
+      ],
+      "expected_defect_ids": [
+        "MVP-005",
+        "MVP-008"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [
+        "MVP-005",
+        "MVP-008"
+      ],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 0.0,
+      "notice_index": 10
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: July 20, 2022\nTo:\nJohn Doe\n5678 Pacific Heights Blvd, Unit 3A\nLos Angeles, CA 90046\nFrom:\n\n\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of ren...",
+      "expected_defects": [
+        "missing_payee_info"
+      ],
+      "expected_defect_ids": [
+        "MVP-004"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-007",
+          "title": "Electronic Payment Not Previously Established",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002",
+        "MVP-007"
+      ],
+      "true_positives": [
+        "MVP-004"
+      ],
+      "false_positives": [
+        "MVP-009",
+        "MVP-002",
+        "MVP-007"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.25,
+      "recall": 1.0,
+      "notice_index": 11
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: January 10, 2023\nTo:\nJohn Doe\n5678 Ocean Front Walk, Apt. 12\nLos Angeles, CA 90001\nFrom:\nPacific Breeze Properties, Inc.\nc/o Property Management Office\nLos Angel...",
+      "expected_defects": [
+        "financial_institution_incomplete"
+      ],
+      "expected_defect_ids": [
+        "MVP-006"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-002",
+        "MVP-004",
+        "MVP-009",
+        "MVP-003"
+      ],
+      "true_positives": [
+        "MVP-006"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002",
+        "MVP-003"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.2,
+      "recall": 1.0,
+      "notice_index": 12
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: January 20, 2023\nTo:\nJohn Smith\n789 Ocean View Blvd, Apt. 3\nLos Angeles, CA 90001\nFrom:\nPacific Waves Apartments, LLC\nLos Angeles, CA\nYOU ARE HEREBY NOTIFIED tha...",
+      "expected_defects": [
+        "financial_institution_incomplete",
+        "missing_payee_info"
+      ],
+      "expected_defect_ids": [
+        "MVP-006",
+        "MVP-004"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-007",
+          "title": "Electronic Payment Not Previously Established",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-002",
+        "MVP-004",
+        "MVP-009",
+        "MVP-007"
+      ],
+      "true_positives": [
+        "MVP-006",
+        "MVP-004"
+      ],
+      "false_positives": [
+        "MVP-009",
+        "MVP-002",
+        "MVP-007"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.4,
+      "recall": 1.0,
+      "notice_index": 13
+    },
+    {
+      "notice_text": "1-DAY NOTICE TO PAY RENT OR QUIT\nDate: February 8, 2023\nTo:\nJohn Doe\n5678 Ocean View Blvd, Apt. 2\nLos Angeles, CA 90001\nFrom:\n\n\nYOU ARE HEREBY NOTIFIED that you are in default in the payment of rent f...",
+      "expected_defects": [
+        "missing_payee_info",
+        "insufficient_period"
+      ],
+      "expected_defect_ids": [
+        "MVP-004",
+        "MVP-002"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-007",
+          "title": "Electronic Payment Not Previously Established",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002",
+        "MVP-007"
+      ],
+      "true_positives": [
+        "MVP-004",
+        "MVP-002"
+      ],
+      "false_positives": [
+        "MVP-009",
+        "MVP-007"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.5,
+      "recall": 1.0,
+      "notice_index": 14
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: January 3, 2023\nTo:\nJohn Doe\n5678 Ocean Front Walk, Unit B\nLos Angeles, CA 90291\nFrom:\nPacific Shores Realty, Inc.\nc/o Property Management Office\nLos Angeles, CA...",
+      "expected_defects": [
+        "financial_institution_incomplete",
+        "no_amount_stated"
+      ],
+      "expected_defect_ids": [
+        "MVP-006",
+        "MVP-003"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-002",
+        "MVP-004",
+        "MVP-009",
+        "MVP-003"
+      ],
+      "true_positives": [
+        "MVP-006",
+        "MVP-003"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.4,
+      "recall": 1.0,
+      "notice_index": 15
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: February 18, 2023\nTo:\nJohn Doe\n5678 Pacific Coast Highway, Apt. 10\nLos Angeles, CA 90291\nFrom:\nGolden State Properties, Inc.\nc/o Property Management Office\nLos A...",
+      "expected_defects": [
+        "financial_institution_incomplete",
+        "missing_payment_hours"
+      ],
+      "expected_defect_ids": [
+        "MVP-006",
+        "MVP-005"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-006",
+          "title": "Incomplete Financial Institution Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-006",
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "true_positives": [
+        "MVP-006"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [
+        "MVP-005"
+      ],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.25,
+      "recall": 0.5,
+      "notice_index": 16
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY AND QUIT\nDate: January 12, 2022\nTo:\nJohn Doe\n5678 Pacific Heights Blvd, Apt. 10\nLos Angeles, CA 90001\nFrom:\nSunset Boulevard Realty, Inc.\nc/o Management Office\nLos Angeles, CA\nYOU ...",
+      "expected_defects": [
+        "not_disjunctive",
+        "no_amount_stated"
+      ],
+      "expected_defect_ids": [
+        "MVP-003",
+        "MVP-001"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-001",
+          "title": "Notice Not Phrased in the Disjunctive",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-007",
+          "title": "Electronic Payment Not Previously Established",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-002",
+        "MVP-004",
+        "MVP-001",
+        "MVP-009",
+        "MVP-007",
+        "MVP-003"
+      ],
+      "true_positives": [
+        "MVP-003",
+        "MVP-001"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002",
+        "MVP-007"
+      ],
+      "false_negatives": [],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "notice_index": 17
+    },
+    {
+      "notice_text": "1-DAY NOTICE TO PAY RENT OR QIT\nDate: April 8, 2022\nTo:\nJohn Smith\n4321 Ocean Avenue, Apt. 10\nLos Angeles, CA 90001\nFrom:\nSunset Properties, Inc.\nc/o Property Management Office\nLos Angeles, CA\nYOU ARE...",
+      "expected_defects": [
+        "electronic_payment_not_established",
+        "no_amount_stated",
+        "insufficient_period"
+      ],
+      "expected_defect_ids": [
+        "MVP-003",
+        "MVP-002",
+        "MVP-007"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-001",
+          "title": "Notice Not Phrased in the Disjunctive",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-002",
+        "MVP-004",
+        "MVP-001",
+        "MVP-009",
+        "MVP-003"
+      ],
+      "true_positives": [
+        "MVP-003",
+        "MVP-002"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-001"
+      ],
+      "false_negatives": [
+        "MVP-007"
+      ],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.4,
+      "recall": 0.6666666666666666,
+      "notice_index": 18
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: January 27, 2023\nTo:\nJohn Doe\n7890 Ocean View Lane, Apt. 10\nLos Angeles, CA 90001\nFrom:\nPacific Heights Properties, Inc.\nc/o Property Management Office\nLos Angel...",
+      "expected_defects": [
+        "missing_payment_hours"
+      ],
+      "expected_defect_ids": [
+        "MVP-005"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-003",
+          "title": "No Exact Amount Stated",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing All Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-003",
+        "MVP-009",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "true_positives": [],
+      "false_positives": [
+        "MVP-003",
+        "MVP-009",
+        "MVP-002",
+        "MVP-004"
+      ],
+      "false_negatives": [
+        "MVP-005"
+      ],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.0,
+      "recall": 0.0,
+      "notice_index": 19
+    },
+    {
+      "notice_text": "3-DAY NOTICE TO PAY RENT OR QUIT\nDate: July 12, 2022\nTo:\nJohn Doe\n5678 Pacific Coast Highway, Apt. 10\nLos Angeles, CA 90045\nFrom:\nPacific Heights Properties, Inc.\nc/o Property Management Office\nLos An...",
+      "expected_defects": [
+        "electronic_payment_not_established",
+        "rent_over_one_year"
+      ],
+      "expected_defect_ids": [
+        "MVP-008",
+        "MVP-007"
+      ],
+      "detected_defects": [
+        {
+          "defect_id": "MVP-002",
+          "title": "No Service Date",
+          "severity": "major"
+        },
+        {
+          "defect_id": "MVP-004",
+          "title": "Missing Payee Information",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-008",
+          "title": "Rent Over One Year Old",
+          "severity": "critical"
+        },
+        {
+          "defect_id": "MVP-009",
+          "title": "No Forfeiture Declaration",
+          "severity": "critical"
+        }
+      ],
+      "detected_defect_ids": [
+        "MVP-009",
+        "MVP-004",
+        "MVP-008",
+        "MVP-002"
+      ],
+      "true_positives": [
+        "MVP-008"
+      ],
+      "false_positives": [
+        "MVP-004",
+        "MVP-009",
+        "MVP-002"
+      ],
+      "false_negatives": [
+        "MVP-007"
+      ],
+      "is_valid": false,
+      "expected_valid": false,
+      "validation_correct": false,
+      "precision": 0.25,
+      "recall": 0.5,
+      "notice_index": 20
+    }
+  ]
+}
