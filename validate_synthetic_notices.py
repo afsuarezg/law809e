@@ -28,7 +28,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from collections import defaultdict
 
 # Import directly to avoid importing OCRProcessor (which requires pytesseract)
@@ -68,7 +68,8 @@ DEFECT_MAPPING = {
 def validate_synthetic_notice(
     notice_text: str,
     expected_defects: List[str],
-    use_regex: bool = False
+    use_regex: bool = False,
+    llm_provider: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Validate a single synthetic notice.
@@ -77,6 +78,8 @@ def validate_synthetic_notice(
         notice_text: The text of the eviction notice
         expected_defects: List of expected defect type strings
         use_regex: If True, use regex extraction instead of LLM
+        llm_provider: Optional LLM provider to use ("ollama", "openai", "anthropic").
+                     Only used if use_regex=False. If None, uses default priority.
         
     Returns:
         Dictionary with validation results
@@ -86,7 +89,7 @@ def validate_synthetic_notice(
         if use_regex:
             extractor = RegexExtractor()
         else:
-            extractor = EntityExtractor()
+            extractor = EntityExtractor(provider=llm_provider)
         
         extracted_notice = extractor.extract(notice_text)
         
@@ -146,7 +149,8 @@ def validate_synthetic_notice(
 def validate_batch(
     json_file_path: str,
     use_regex: bool = False,
-    output_path: str = None
+    output_path: str = None,
+    llm_provider: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Validate a batch of synthetic notices.
@@ -155,6 +159,8 @@ def validate_batch(
         json_file_path: Path to JSON file with synthetic notices
         use_regex: If True, use regex extraction instead of LLM
         output_path: Optional path to save validation report (None = print only)
+        llm_provider: Optional LLM provider to use ("ollama", "openai", "anthropic").
+                     Only used if use_regex=False. If None, uses default priority.
         
     Returns:
         Dictionary with validation results for all notices
@@ -168,11 +174,12 @@ def validate_batch(
         raise ValueError("No notices found in JSON file")
     
     print(f"Validating {len(notices)} notices...")
-    print(f"Using {'regex' if use_regex else 'LLM'} extraction")
-    if not use_regex:
-        print("Note: LLM extraction requires API access (OpenAI, Anthropic, or Ollama)\n")
+    if use_regex:
+        print("Using regex extraction\n")
     else:
-        print()
+        provider_info = f" ({llm_provider})" if llm_provider else ""
+        print(f"Using LLM extraction{provider_info}")
+        print("Note: LLM extraction requires API access (OpenAI, Anthropic, or Ollama)\n")
     
     results = []
     for i, notice in enumerate(notices, 1):
@@ -184,7 +191,8 @@ def validate_batch(
         result = validate_synthetic_notice(
             notice_text,
             expected_defects,
-            use_regex=use_regex
+            use_regex=use_regex,
+            llm_provider=llm_provider
         )
         result['notice_index'] = i
         results.append(result)
@@ -293,6 +301,11 @@ Examples:
   # Use LLM extraction (default) and print results
   python validate_synthetic_notices.py batch_10_notices.json
   
+  # Use specific LLM provider
+  python validate_synthetic_notices.py batch_10_notices.json --llm-provider openai
+  python validate_synthetic_notices.py batch_10_notices.json --llm-provider anthropic
+  python validate_synthetic_notices.py batch_10_notices.json --llm-provider ollama
+  
   # Use regex extraction (faster, no API)
   python validate_synthetic_notices.py batch_10_notices.json --regex
   
@@ -302,8 +315,8 @@ Examples:
   # Save report to file
   python validate_synthetic_notices.py batch_10_notices.json --output report.json
   
-  # Using uv
-  uv run python validate_synthetic_notices.py batch_10_notices.json --regex --print-only
+  # Using uv with specific provider
+  uv run python validate_synthetic_notices.py batch_10_notices.json --llm-provider openai --print-only
         """
     )
     parser.add_argument(
@@ -318,6 +331,12 @@ Examples:
         "--regex",
         action="store_true",
         help="Use regex extraction instead of LLM (faster, no API needed). Default: uses LLM"
+    )
+    parser.add_argument(
+        "--llm-provider",
+        choices=["ollama", "openai", "anthropic"],
+        help="Choose specific LLM provider (only used if not using --regex). "
+             "If not specified, uses default priority: Ollama > OpenAI > Anthropic"
     )
     parser.add_argument(
         "--print-only",
@@ -346,7 +365,8 @@ Examples:
         report = validate_batch(
             args.json_file,
             use_regex=args.regex,
-            output_path=output_path
+            output_path=output_path,
+            llm_provider=args.llm_provider
         )
         
         if not args.quiet:

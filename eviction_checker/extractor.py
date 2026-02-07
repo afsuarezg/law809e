@@ -16,8 +16,22 @@ logger = logging.getLogger(__name__)
 class EntityExtractor:
     """Extracts structured entities from eviction notice text."""
 
-    def __init__(self, llm_client: Optional[LLMClient] = None):
-        self.llm_client = llm_client or LLMClient(temperature=0.0)
+    def __init__(self, llm_client: Optional[LLMClient] = None, provider: Optional[str] = None):
+        """
+        Initialize EntityExtractor.
+        
+        Args:
+            llm_client: Optional pre-configured LLMClient. If None, creates one.
+            provider: Optional provider name ("ollama", "openai", "anthropic") to force a specific provider.
+                     If None, uses default priority (Ollama > OpenAI > Anthropic).
+        """
+        if llm_client is not None:
+            self.llm_client = llm_client
+        elif provider:
+            # Create LLMClient with specific provider preference
+            self.llm_client = LLMClient(temperature=0.0, preferred_provider=provider)
+        else:
+            self.llm_client = LLMClient(temperature=0.0)
 
     def extract(self, raw_text: str) -> ExtractedNotice:
         """
