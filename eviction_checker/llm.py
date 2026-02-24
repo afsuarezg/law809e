@@ -165,13 +165,12 @@ class LLMClient:
 
     def _complete_anthropic(self, prompt: str, system_message: Optional[str]) -> str:
         """Get completion from Anthropic."""
-        # Try common model names in order of preference
+        # Try common model names in order of preference (active as of 2026; see docs.anthropic.com model deprecations)
         default_models = [
-            "claude-3-sonnet-20240229",  # Most widely available
-            "claude-3-5-sonnet-20241022",
-            "claude-3-opus-20240229",
-            "claude-3-haiku-20240307",
-            "claude-3-5-haiku-20241022"
+            "claude-sonnet-4-6",
+            "claude-sonnet-4-5-20250929",
+            "claude-opus-4-6",
+            "claude-haiku-4-5-20251001",
         ]
         
         model = os.getenv("ANTHROPIC_MODEL")
@@ -209,9 +208,9 @@ class LLMClient:
                 logger.error(f"Available models: {', '.join(available_models[:5])}")
             else:
                 logger.error("Could not retrieve available models. Check your API key and try:")
-                logger.error("  - claude-3-sonnet-20240229")
-                logger.error("  - claude-3-opus-20240229")
-                logger.error("  - claude-3-haiku-20240307")
+                logger.error("  - claude-sonnet-4-6")
+                logger.error("  - claude-opus-4-6")
+                logger.error("  - claude-haiku-4-5-20251001")
             raise last_error or ValueError("No Anthropic model available")
         
         # Use specified model
@@ -236,9 +235,9 @@ class LLMClient:
                     logger.error(f"Available models: {', '.join(available_models[:5])}")
                 else:
                     logger.error("Try setting ANTHROPIC_MODEL to one of:")
-                    logger.error("  - claude-3-sonnet-20240229")
-                    logger.error("  - claude-3-opus-20240229")
-                    logger.error("  - claude-3-haiku-20240307")
+                    logger.error("  - claude-sonnet-4-6")
+                    logger.error("  - claude-opus-4-6")
+                    logger.error("  - claude-haiku-4-5-20251001")
             raise
 
     def _extract_json(self, text: str) -> Dict[str, Any]:

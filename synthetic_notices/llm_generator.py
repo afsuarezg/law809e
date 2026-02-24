@@ -72,7 +72,7 @@ class LLMNoticeGenerator:
         """Get default model for provider."""
         defaults = {
             "openai": "gpt-4",
-            "anthropic": "claude-3-opus-20240229",
+            "anthropic": "claude-sonnet-4-6",
             "google": "gemini-pro"
         }
         return defaults.get(self.provider, "gpt-4")

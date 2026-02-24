@@ -1,6 +1,6 @@
 #json files
 .synthetic_notices/output/LLM_generated/*.json
-
+*.json
 # Environment variables
 .env
 
@@ -62,3 +62,4 @@ output/
 *.img
 
 *.ps1
+batch_10_notices_feb7_formatted.json
