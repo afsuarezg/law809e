@@ -56,11 +56,16 @@ class LLMNoticeGenerator:
         if seed is not None:
             random.seed(seed)
         
-        # Load sample notice template
-        template_path = Path(__file__).parent / "templates" / "sample_notice.txt"
-        if template_path.exists():
+        # Load sample notice template - randomly choose from available sample_notice*.txt files
+        templates_dir = Path(__file__).parent / "templates"
+        sample_notice_files = list(templates_dir.glob("sample_notice*.txt"))
+        
+        if sample_notice_files:
+            # Randomly select one of the available sample notice files
+            template_path = random.choice(sample_notice_files)
             self.sample_template = template_path.read_text()
         else:
+            # Fallback to default template if no sample notice files found
             self.sample_template = self._get_default_template()
 
     def _get_default_model(self) -> str:
