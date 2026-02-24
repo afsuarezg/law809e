@@ -39,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def sanitize_line(line: str) -> str:
+def sanitize_text(line: str) -> str:
     """Replace characters that latin-1 (fpdf2 core font encoding) cannot represent."""
     replacements = {
         "\u2013": "-",   # en dash
@@ -71,10 +71,9 @@ def notice_to_pdf(text: str, output_path: Path) -> None:
     # epw = effective page width (page width minus left and right margins)
     page_width = pdf.epw
 
-    for line in text.split("\n"):
-        safe_line = sanitize_line(line)
-        # multi_cell wraps long lines; use explicit width instead of 0
-        pdf.multi_cell(page_width, line_height, safe_line)
+    # multi_cell handles \n splits internally; single call avoids x-position drift
+    safe_text = sanitize_text(text)
+    pdf.multi_cell(page_width, line_height, safe_text)
 
     pdf.output(str(output_path))
 
