@@ -4,6 +4,8 @@
 # Environment variables
 .env
 
+#.csv files 
+*.csv
 # Python
 __pycache__/
 *.py[cod]
