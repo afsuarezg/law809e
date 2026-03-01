@@ -212,7 +212,7 @@ Generate a valid 3-Day Notice to Pay Rent or Quit for California. The notice mus
 REQUIRED ELEMENTS FOR A VALID NOTICE:
 1. Disjunctive demand: Must use "pay OR quit" (not "pay AND quit")
 2. Amount stated: Must specify the exact dollar amount of rent owed
-3. Rent period: Must specify the period for which rent is due (cannot be more than 12 months old)
+3. Rent period: Must specify the period for which rent is due (cannot be more than 12 months old or less than 1 month old based on the date of the notice)
 4. Three business days: Must give at least 3 business days (excluding weekends and holidays)
 5. Payee information: Must include the exact name, exact street address (not just city/state), and exact phone number of the payee. Generic references like "property management office" without a specific address are insufficient.
 6. Payment hours: If in-person payment is allowed, must specify exact business hours (e.g., "Monday through Friday, 9:00 AM to 5:00 PM"). Generic statements like "normal business hours" or "during business hours" are NOT sufficient and do not meet this requirement.
@@ -248,7 +248,7 @@ Since this is a valid notice, the defects array should be empty. Return ONLY val
         defect_descriptions = {
             DefectType.NOT_DISJUNCTIVE: "Use 'pay AND quit' instead of 'pay OR quit'",
             DefectType.INSUFFICIENT_PERIOD: "Give less than 3 business days (e.g., only 1-2 days)",
-            DefectType.NO_AMOUNT_STATED: "Do not specify the exact dollar amount of rent owed",
+            DefectType.NO_AMOUNT_STATED: "Do not specify the exact dollar amount of rent owed or claim that the amount due also include penalties or interest. Don't include a placeholder amount like 'amount due' or 'total amount due'. Only omit that information from the notice.",
             DefectType.MISSING_PAYEE_INFO: "Omit landlord name, address, or phone number",
             DefectType.MISSING_PAYMENT_HOURS: "Allow in-person payment but don't specify business hours",
             DefectType.FINANCIAL_INSTITUTION_INCOMPLETE: "Include bank payment option but omit address, account number, or 5-mile statement",
