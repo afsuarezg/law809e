@@ -101,6 +101,10 @@ IMPORTANT:
 - Set "is_rent" to FALSE for: late fees, NSF fees, utilities, trash, damages, cleaning, etc.
 - Dates should be in YYYY-MM-DD format
 - If information is missing, use null
+- For "total_amount_demanded": look for embedded sentences like "the total amount of rent due and unpaid is: $X", "amount of $X", "the sum of $X", or a standalone dollar figure
+- For "days_to_comply": extract the integer from phrases like "WITHIN THREE (3) BUSINESS DAYS" → 3, "within one (1) day" → 1, "within 3 days" → 3
+- For "service_date": look in a proof-of-service section at the bottom: "I served this notice on [date]", "Date Served: [date]", or "served on [date]"
+- For "payment_terms.payee_name": extract the entity name from "made payable to X", "paid to X", "payable to [company]", or "payable to [Name]"
 
 Return ONLY valid JSON."""
 

@@ -77,29 +77,8 @@ class NoticeValidator:
 
     def _check_notice_period(self, notice: ExtractedNotice) -> Optional[Defect]:
         """Check if notice gives 3 business days."""
-        if not notice.service_date:
-            return Defect(
-                defect_id="MVP-002",
-                title="No Service Date",
-                severity=Severity.MAJOR,
-                description="Cannot verify 3-day period without service date.",
-                statute_violated="CCP 1161(2), 1162",
-                tenant_action="Missing service date is a significant defect.",
-                evidence="No service date found"
-            )
-
-        if not notice.termination_date and not notice.days_to_comply:
-            return Defect(
-                defect_id="MVP-002",
-                title="Notice Period Not Stated",
-                severity=Severity.MAJOR,
-                description="The deadline is not clearly stated.",
-                statute_violated="CCP 1161(2)",
-                tenant_action="Unclear deadline may invalidate notice.",
-                evidence="No deadline found"
-            )
-
         if notice.service_date and notice.termination_date:
+            # Both dates present: count business days precisely
             business_days = self._count_business_days(
                 notice.service_date, notice.termination_date
             )
@@ -113,7 +92,27 @@ class NoticeValidator:
                     tenant_action="This defect invalidates the notice.",
                     evidence=f"Service: {notice.service_date}, Deadline: {notice.termination_date}"
                 )
+            return None
 
+        # No service date (common in LLM-generated or typeset notices without
+        # a proof-of-service section).  Fall back to the explicit days_to_comply
+        # field extracted from text like "WITHIN THREE (3) BUSINESS DAYS".
+        if notice.days_to_comply is not None:
+            if notice.days_to_comply < 3:
+                return Defect(
+                    defect_id="MVP-002",
+                    title="Insufficient Notice Period",
+                    severity=Severity.CRITICAL,
+                    description=f"Notice states only {notice.days_to_comply} day(s) to comply; 3 business days required.",
+                    statute_violated="CCP 1161(2), 12, 12a",
+                    tenant_action="This defect invalidates the notice.",
+                    evidence=f"days_to_comply={notice.days_to_comply}"
+                )
+            # days_to_comply >= 3: period is stated and sufficient
+            return None
+
+        # Neither service date nor explicit day count — cannot assess the period
+        # on the face of the document.  Give benefit of the doubt.
         return None
 
     def _count_business_days(self, start: date, end: date) -> int:

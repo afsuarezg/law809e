@@ -114,11 +114,27 @@ class TestDisjunctivePhrasing:
 class TestNoticePeriod:
     """MVP-002: Must give 3 business days excluding weekends/holidays."""
 
-    def test_missing_service_date(self, validator):
+    def test_missing_service_date_no_days_is_not_defect(self, validator):
+        # Per updated logic: missing service_date with no days_to_comply gives
+        # benefit of the doubt — cannot assess the period on the face of the doc.
         notice = ExtractedNotice(
             raw_text="Pay rent or quit. Forfeiture.",
             notice_type=NoticeType.THREE_DAY_PAY,
-            service_date=None
+            service_date=None,
+            days_to_comply=None,
+        )
+        defects = validator.validate(notice)
+        assert not any(d.defect_id == "MVP-002" for d in defects)
+
+    def test_missing_service_date_with_insufficient_days_is_defect(self, validator):
+        # days_to_comply explicitly states fewer than 3 → still a genuine defect.
+        notice = ExtractedNotice(
+            raw_text="Pay rent or quit. Forfeiture. Phone: (310) 555-1234",
+            notice_type=NoticeType.THREE_DAY_PAY,
+            service_date=None,
+            days_to_comply=1,
+            total_amount_demanded=Decimal("1500"),
+            payment_terms=PaymentTerms(payee_name="Landlord", payment_address="123 Main St"),
         )
         defects = validator.validate(notice)
         assert any(d.defect_id == "MVP-002" for d in defects)
@@ -382,8 +398,8 @@ class TestBusinessDayCalculation:
     """Test business day calculation helper."""
 
     def test_excludes_weekends(self, validator):
-        # Friday Jan 12 to Monday Jan 15 = only 1 business day (Monday)
-        days = validator._count_business_days(date(2024, 1, 12), date(2024, 1, 15))
+        # Friday Jan 5 to Monday Jan 8 = 1 business day (Monday; not a holiday)
+        days = validator._count_business_days(date(2024, 1, 5), date(2024, 1, 8))
         assert days == 1
 
     def test_full_week(self, validator):
