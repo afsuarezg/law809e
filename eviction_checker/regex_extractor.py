@@ -70,6 +70,7 @@ class RegexExtractor:
         payment_terms = self._extract_payment_terms(raw_text)
 
         is_signed = self._check_signature(raw_text)
+        has_forfeiture_declaration = self._check_forfeiture_language(raw_text)
 
         return ExtractedNotice(
             raw_text=raw_text,
@@ -86,6 +87,7 @@ class RegexExtractor:
             termination_date=termination_date,
             payment_terms=payment_terms,
             is_signed=is_signed,
+            has_forfeiture_declaration=has_forfeiture_declaration,
         )
 
     def _extract_tenant_names(self, text: str) -> List[str]:
@@ -354,3 +356,14 @@ class RegexExtractor:
                 return True
 
         return False
+
+    def _check_forfeiture_language(self, text: str) -> bool:
+        """Check if notice contains a forfeiture declaration."""
+        forfeiture_patterns = [
+            r'forfeit',
+            r'forfeiture',
+            r'lease.{0,30}(terminated|void|ended)',
+            r'tenancy.{0,30}(terminated|void|ended)',
+            r'declare.{0,30}(terminated|void|forfeited)',
+        ]
+        return any(re.search(p, text, re.IGNORECASE) for p in forfeiture_patterns)

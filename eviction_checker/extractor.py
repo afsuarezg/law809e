@@ -93,7 +93,8 @@ Extract:
     "payment_methods": ["cash", "check", "money order"]
   }},
 
-  "is_signed": true
+  "is_signed": true,
+  "has_forfeiture_declaration": true
 }}
 
 IMPORTANT:
@@ -105,6 +106,7 @@ IMPORTANT:
 - For "days_to_comply": extract the integer from phrases like "WITHIN THREE (3) BUSINESS DAYS" → 3, "within one (1) day" → 1, "within 3 days" → 3
 - For "service_date": look in a proof-of-service section at the bottom: "I served this notice on [date]", "Date Served: [date]", or "served on [date]"
 - For "payment_terms.payee_name": extract the entity name from "made payable to X", "paid to X", "payable to [company]", or "payable to [Name]"
+- For "has_forfeiture_declaration": set true if the notice contains any forfeiture or lease-termination language such as "forfeit", "forfeiture of the lease", "tenancy is terminated", "declare a forfeiture", or "lease shall be void". Set false if no such language is present.
 
 Return ONLY valid JSON."""
 

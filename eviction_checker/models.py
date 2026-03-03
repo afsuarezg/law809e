@@ -75,6 +75,7 @@ class ExtractedNotice(BaseModel):
 
     # Flags
     is_signed: bool = False
+    has_forfeiture_declaration: Optional[bool] = None
 
 
 class Defect(BaseModel):

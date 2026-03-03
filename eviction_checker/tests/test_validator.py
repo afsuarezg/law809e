@@ -393,6 +393,30 @@ class TestForfeitureDeclaration:
         defects = validator.validate(notice)
         assert not any(d.defect_id == "MVP-009" for d in defects)
 
+    def test_extracted_true_overrides_missing_raw_text(self, validator):
+        """has_forfeiture_declaration=True suppresses MVP-009 even without keywords in raw_text."""
+        notice = ExtractedNotice(
+            raw_text="Pay rent or quit. Phone: (310) 555-1234",
+            notice_type=NoticeType.THREE_DAY_PAY,
+            total_amount_demanded=Decimal("1500"),
+            payment_terms=PaymentTerms(payee_name="Landlord", payment_address="123 Main St"),
+            has_forfeiture_declaration=True,
+        )
+        defects = validator.validate(notice)
+        assert not any(d.defect_id == "MVP-009" for d in defects)
+
+    def test_extracted_false_fires_defect_despite_raw_text(self, validator):
+        """has_forfeiture_declaration=False fires MVP-009 even when raw_text has keywords."""
+        notice = ExtractedNotice(
+            raw_text="Pay rent or quit. Forfeiture declared. Phone: (310) 555-1234",
+            notice_type=NoticeType.THREE_DAY_PAY,
+            total_amount_demanded=Decimal("1500"),
+            payment_terms=PaymentTerms(payee_name="Landlord", payment_address="123 Main St"),
+            has_forfeiture_declaration=False,
+        )
+        defects = validator.validate(notice)
+        assert any(d.defect_id == "MVP-009" for d in defects)
+
 
 class TestBusinessDayCalculation:
     """Test business day calculation helper."""

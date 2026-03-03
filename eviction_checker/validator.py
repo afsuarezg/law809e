@@ -314,17 +314,21 @@ class NoticeValidator:
 
     def _check_forfeiture_declaration(self, notice: ExtractedNotice) -> Optional[Defect]:
         """Check if notice declares a forfeiture."""
-        text = notice.raw_text.lower()
+        if notice.has_forfeiture_declaration is not None:
+            found = notice.has_forfeiture_declaration
+        else:
+            # Fallback: raw-text regex (backward compat for LLM path when field absent)
+            text = notice.raw_text.lower()
+            forfeiture_patterns = [
+                r'forfeit',
+                r'forfeiture',
+                r'lease.{0,30}(terminated|void|ended)',
+                r'tenancy.{0,30}(terminated|void|ended)',
+                r'declare.{0,30}(terminated|void|forfeited)',
+            ]
+            found = any(re.search(p, text) for p in forfeiture_patterns)
 
-        forfeiture_patterns = [
-            r'forfeit',
-            r'forfeiture',
-            r'lease.{0,30}(terminated|void|ended)',
-            r'tenancy.{0,30}(terminated|void|ended)',
-            r'declare.{0,30}(terminated|void|forfeited)',
-        ]
-
-        if any(re.search(p, text) for p in forfeiture_patterns):
+        if found:
             return None
 
         return Defect(
