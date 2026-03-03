@@ -325,6 +325,7 @@ class NoticeValidator:
                 r'lease.{0,30}(terminated|void|ended)',
                 r'tenancy.{0,30}(terminated|void|ended)',
                 r'declare.{0,30}(terminated|void|forfeited)',
+                r'legal proceedings.{0,60}recover possession.{0,120}unlawful detainer',
             ]
             found = any(re.search(p, text) for p in forfeiture_patterns)
 

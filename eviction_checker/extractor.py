@@ -106,7 +106,11 @@ IMPORTANT:
 - For "days_to_comply": extract the integer from phrases like "WITHIN THREE (3) BUSINESS DAYS" → 3, "within one (1) day" → 1, "within 3 days" → 3
 - For "service_date": look in a proof-of-service section at the bottom: "I served this notice on [date]", "Date Served: [date]", or "served on [date]"
 - For "payment_terms.payee_name": extract the entity name from "made payable to X", "paid to X", "payable to [company]", or "payable to [Name]"
-- For "has_forfeiture_declaration": set true if the notice contains any forfeiture or lease-termination language such as "forfeit", "forfeiture of the lease", "tenancy is terminated", "declare a forfeiture", or "lease shall be void". Set false if no such language is present.
+- For "has_forfeiture_declaration": set true if the notice contains ANY of the following:
+  (a) explicit forfeiture language: "forfeit", "forfeited", "forfeiture of the lease", "declared forfeited", "deemed forfeited", "declare a forfeiture", "lease shall be void"; OR
+  (b) tenancy-termination language: "tenancy is terminated", "tenancy will be terminated", "tenancy will be declared terminated"; OR
+  (c) consequence language combining recovery-of-possession with an unlawful detainer action: e.g. "legal proceedings to recover possession of the premises" together with "unlawful detainer".
+  Set false ONLY if the notice contains none of the above — i.e. it describes no consequence for non-payment at all.
 
 Return ONLY valid JSON."""
 
