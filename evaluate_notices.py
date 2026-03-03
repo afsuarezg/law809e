@@ -244,7 +244,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--provider",
-        choices=["anthropic", "openai", "ollama"],
+        choices=["anthropic", "openai", "ollama", "google"],
         default="anthropic",
         help="LLM provider when --mode=llm (default: anthropic)",
     )

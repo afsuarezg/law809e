@@ -5,6 +5,7 @@ Supports:
 - Ollama (local, recommended for privacy)
 - OpenAI
 - Anthropic
+- Google Gemini
 """
 
 import os
@@ -18,15 +19,17 @@ logger = logging.getLogger(__name__)
 class LLMClient:
     """Unified LLM client supporting Ollama, OpenAI, and Anthropic."""
 
+    KNOWN_PROVIDERS = ["ollama", "openai", "anthropic", "google"]
+
     def __init__(self, temperature: float = 0.0, max_tokens: int = 4000, preferred_provider: Optional[str] = None):
         """
         Initialize LLM client.
-        
+
         Args:
             temperature: Temperature for generation (default: 0.0)
             max_tokens: Maximum tokens in response (default: 4000)
-            preferred_provider: Optional provider to use ("ollama", "openai", "anthropic").
-                               If None, uses priority order: Ollama > OpenAI > Anthropic
+            preferred_provider: Optional provider to use ("ollama", "openai", "anthropic", "google").
+                               If None, uses priority order: Ollama > OpenAI > Anthropic > Google
         """
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -34,11 +37,13 @@ class LLMClient:
         self.ollama_model = None
         self.openai_client = None
         self.anthropic_client = None
+        self.google_client = None
+        self.google_model = None
         self.preferred_provider = preferred_provider.lower() if preferred_provider else None
 
         # Initialize all available providers
         providers_initialized = []
-        
+
         # Ollama (local inference)
         ollama_model = os.getenv("OLLAMA_MODEL")
         if ollama_model:
@@ -77,36 +82,59 @@ class LLMClient:
             except Exception as e:
                 logger.warning(f"Failed to initialize Anthropic: {e}")
 
-        if not self.ollama_client and not self.openai_client and not self.anthropic_client:
+        # Google Gemini
+        google_key = os.getenv("GOOGLE_API_KEY")
+        if google_key:
+            try:
+                from google import genai
+                self.google_client = genai.Client(api_key=google_key)
+                self.google_model = os.getenv("GOOGLE_MODEL", "gemini-2.5-flash")
+                providers_initialized.append("google")
+                logger.info(f"Google Gemini client initialized: {self.google_model}")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Google Gemini: {e}")
+
+        if not any([self.ollama_client, self.openai_client,
+                    self.anthropic_client, self.google_client]):
             raise ValueError(
                 "No LLM configured. Set OLLAMA_MODEL for local inference, "
-                "or OPENAI_API_KEY / ANTHROPIC_API_KEY for cloud APIs."
+                "or OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_API_KEY for cloud APIs."
             )
-        
+
         # Validate preferred provider if specified
         if self.preferred_provider:
-            if self.preferred_provider == "ollama" and not self.ollama_client:
-                raise ValueError(f"Preferred provider 'ollama' not available. Available: {providers_initialized}")
-            elif self.preferred_provider == "openai" and not self.openai_client:
-                raise ValueError(f"Preferred provider 'openai' not available. Available: {providers_initialized}")
-            elif self.preferred_provider == "anthropic" and not self.anthropic_client:
-                raise ValueError(f"Preferred provider 'anthropic' not available. Available: {providers_initialized}")
-            elif self.preferred_provider not in ["ollama", "openai", "anthropic"]:
-                raise ValueError(f"Unknown provider '{self.preferred_provider}'. Must be one of: ollama, openai, anthropic")
+            if self.preferred_provider not in self.KNOWN_PROVIDERS:
+                raise ValueError(
+                    f"Unknown provider '{self.preferred_provider}'. "
+                    f"Must be one of: {', '.join(self.KNOWN_PROVIDERS)}"
+                )
+            client_map = {
+                "ollama": self.ollama_client,
+                "openai": self.openai_client,
+                "anthropic": self.anthropic_client,
+                "google": self.google_client,
+            }
+            if not client_map[self.preferred_provider]:
+                raise ValueError(
+                    f"Preferred provider '{self.preferred_provider}' not available. "
+                    f"Available: {providers_initialized}"
+                )
 
     def complete(self, prompt: str, system_message: Optional[str] = None) -> str:
         """Get text completion from LLM."""
         # Use preferred provider if specified, otherwise use priority order
         if self.preferred_provider:
-            if self.preferred_provider == "ollama" and self.ollama_client:
-                return self._complete_ollama(prompt, system_message)
-            elif self.preferred_provider == "openai" and self.openai_client:
-                return self._complete_openai(prompt, system_message)
-            elif self.preferred_provider == "anthropic" and self.anthropic_client:
-                return self._complete_anthropic(prompt, system_message)
-            else:
+            dispatch = {
+                "ollama":    (self.ollama_client,    self._complete_ollama),
+                "openai":    (self.openai_client,    self._complete_openai),
+                "anthropic": (self.anthropic_client, self._complete_anthropic),
+                "google":    (self.google_client,    self._complete_google),
+            }
+            client, fn = dispatch[self.preferred_provider]
+            if not client:
                 raise ValueError(f"Preferred provider '{self.preferred_provider}' not available")
-        
+            return fn(prompt, system_message)
+
         # Default priority order
         if self.ollama_client:
             return self._complete_ollama(prompt, system_message)
@@ -114,6 +142,8 @@ class LLMClient:
             return self._complete_openai(prompt, system_message)
         elif self.anthropic_client:
             return self._complete_anthropic(prompt, system_message)
+        elif self.google_client:
+            return self._complete_google(prompt, system_message)
         raise ValueError("No LLM client available")
 
     def complete_json(self, prompt: str, system_message: Optional[str] = None) -> Dict[str, Any]:
@@ -240,6 +270,52 @@ class LLMClient:
                     logger.error("  - claude-haiku-4-5-20251001")
             raise
 
+    def _complete_google(self, prompt: str, system_message: Optional[str]) -> str:
+        """Get completion from Google Gemini."""
+        from google import genai
+        from google.genai import types
+
+        config_kwargs: Dict[str, Any] = {
+            "temperature": self.temperature,
+            "max_output_tokens": self.max_tokens,
+        }
+        if system_message:
+            config_kwargs["system_instruction"] = system_message
+
+        # If a specific model was set via GOOGLE_MODEL, use it directly.
+        # Otherwise try a fallback list in order of preference.
+        env_model = os.getenv("GOOGLE_MODEL")
+        if env_model:
+            models_to_try = [env_model]
+        else:
+            models_to_try = [
+                self.google_model,   # configured default (gemini-2.5-flash)
+                "gemini-2.5-pro",
+                "gemini-2.0-flash-lite",
+                "gemini-flash-latest",
+            ]
+
+        last_error = None
+        for model in models_to_try:
+            try:
+                response = self.google_client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(**config_kwargs),
+                )
+                logger.info(f"Successfully using Google model: {model}")
+                self.google_model = model  # cache for next call
+                return response.text
+            except Exception as e:
+                last_error = e
+                err = str(e)
+                if "404" in err or "NOT_FOUND" in err or "no longer available" in err.lower():
+                    logger.warning(f"Google model '{model}' unavailable, trying next...")
+                    continue
+                raise  # non-404 errors (auth, quota, etc.) bubble up immediately
+
+        raise last_error or RuntimeError("No Google Gemini model available")
+
     def _extract_json(self, text: str) -> Dict[str, Any]:
         """Extract JSON from LLM response."""
         # Handle markdown code blocks
@@ -257,10 +333,16 @@ class LLMClient:
     @property
     def provider(self) -> str:
         """Return the active provider name."""
+        if self.preferred_provider:
+            if self.preferred_provider == "google":
+                return f"google ({self.google_model})"
+            return self.preferred_provider
         if self.ollama_client:
             return f"ollama ({self.ollama_model})"
         elif self.openai_client:
             return "openai"
         elif self.anthropic_client:
             return "anthropic"
+        elif self.google_client:
+            return f"google ({self.google_model})"
         return "none"
