@@ -56,17 +56,17 @@ class LLMNoticeGenerator:
         if seed is not None:
             random.seed(seed)
         
-        # Load sample notice template - randomly choose from available sample_notice*.txt files
-        templates_dir = Path(__file__).parent / "templates"
-        sample_notice_files = list(templates_dir.glob("sample_notice*.txt"))
-        
-        if sample_notice_files:
-            # Randomly select one of the available sample notice files
-            template_path = random.choice(sample_notice_files)
-            self.sample_template = template_path.read_text()
-        else:
-            # Fallback to default template if no sample notice files found
-            self.sample_template = self._get_default_template()
+        # Build list of available template files in templates_text/; selection happens per notice
+        templates_dir = Path(__file__).parent / "templates" / "templates_text"
+        self._template_files = list(templates_dir.glob("*.txt"))
+        self._default_template = self._get_default_template()
+
+    def _pick_template(self):
+        """Return (text, stem) for a randomly chosen template file."""
+        if self._template_files:
+            path = random.choice(self._template_files)
+            return path.read_text(), path.stem
+        return self._default_template, "default"
 
     def _get_default_model(self) -> str:
         """Get default model for provider."""
@@ -112,14 +112,16 @@ Property Manager, Coastal Bay Properties, LLC"""
 
     def generate_valid_notice(self, **kwargs) -> GeneratedNotice:
         """Generate a valid notice using LLM."""
-        prompt = self._build_valid_prompt(**kwargs)
+        template_text, template_file = self._pick_template()
+        prompt = self._build_valid_prompt(template_text, **kwargs)
         response = self._call_llm(prompt)
         parsed_response = self._parse_json_response(response)
         return GeneratedNotice(
             text=parsed_response["notice_text"],
-            data=None,  # LLM doesn't return structured data
+            data=None,
             defects=[],
-            is_valid=True
+            is_valid=True,
+            template_file=template_file,
         )
 
     def generate_invalid_notice(
@@ -128,29 +130,27 @@ Property Manager, Coastal Bay Properties, LLC"""
         **kwargs
     ) -> GeneratedNotice:
         """Generate a notice with specific defects using LLM."""
-        prompt = self._build_defect_prompt(defects, **kwargs)
+        template_text, template_file = self._pick_template()
+        prompt = self._build_defect_prompt(defects, template_text, **kwargs)
         response = self._call_llm(prompt)
         parsed_response = self._parse_json_response(response)
-        
-        # Extract defects from response, fallback to input defects if not present
+
         response_defects = parsed_response.get("defects", [])
-        # Convert string defect values back to DefectType enums
         parsed_defects = []
         for defect_str in response_defects:
             try:
                 parsed_defects.append(DefectType(defect_str))
             except ValueError:
-                # If LLM returns invalid defect type, skip it
                 pass
-        
-        # Use parsed defects if available, otherwise fallback to input defects
+
         final_defects = parsed_defects if parsed_defects else defects
-        
+
         return GeneratedNotice(
             text=parsed_response["notice_text"],
             data=None,
             defects=final_defects,
-            is_valid=False
+            is_valid=False,
+            template_file=template_file,
         )
 
     def generate_random_invalid_notice(
@@ -203,7 +203,7 @@ Property Manager, Coastal Bay Properties, LLC"""
         random.shuffle(notices)
         return notices
 
-    def _build_valid_prompt(self, **kwargs) -> str:
+    def _build_valid_prompt(self, template_text: str, **kwargs) -> str:
         """Build prompt for valid notice generation."""
         return f"""You are a legal document generator specializing in California eviction notices.
 
@@ -222,7 +222,7 @@ REQUIRED ELEMENTS FOR A VALID NOTICE:
 
 Use the following sample notice as a reference for format and style:
 
-{self.sample_template}
+{template_text}
 
 NOTE: The structure of your generated notice can diverge from the structure of the sample template above. You may organize the information differently, use different section headings, or arrange the content in a different order, as long as all required elements are present and clearly stated.
 
@@ -243,7 +243,7 @@ IMPORTANT: You must return your response as a JSON object with the following str
 
 Since this is a valid notice, the defects array should be empty. Return ONLY valid JSON, no additional commentary or markdown formatting."""
 
-    def _build_defect_prompt(self, defects: List[DefectType], **kwargs) -> str:
+    def _build_defect_prompt(self, defects: List[DefectType], template_text: str, **kwargs) -> str:
         """Build prompt for defective notice generation."""
         defect_descriptions = {
             DefectType.NOT_DISJUNCTIVE: "Use 'pay AND quit' instead of 'pay OR quit'",
@@ -269,7 +269,7 @@ DEFECTS TO INCLUDE:
 
 Use the following sample notice as a reference for format and style:
 
-{self.sample_template}
+{template_text}
 
 Generate a new notice with:
 - Different tenant name(s) and address

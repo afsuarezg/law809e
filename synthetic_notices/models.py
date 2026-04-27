@@ -63,12 +63,14 @@ class GeneratedNotice:
     data: Optional[NoticeData]
     defects: List[DefectType]
     is_valid: bool
+    template_file: Optional[str] = None
 
     def to_dict(self) -> dict:
         result = {
             "text": self.text,
             "defects": [d.value for d in self.defects],
             "is_valid": self.is_valid,
+            "template_file": self.template_file,
         }
         
         # Add metadata if data is available (rule-based generator)
