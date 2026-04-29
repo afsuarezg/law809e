@@ -1,0 +1,505 @@
+AI Agents for Eviction Notice Defects
+R&D plan/solution scopingStanford Legal Design Lab
+
+
+Eviction Notice Defect Spotter
+The agent is used while answering an eviction lawsuit, filling out UD-105.
+It lets a tenant, advocate, or legal team quickly analyze the warning notice (often 3-day Pay or Quit) to identify if there are any defects on its face or that need followup with the user.
+If there are defects (we can assume in about 10% of cases), this will be checked off as a defense on the UD-105 and will be a very strong defense to get the case dismissed or with a favorable settlement.
+
+Who would use this tool?
+ From Ryan:
+there are applications for a notice analyzer with 
+legal service providers preparing Answers for tenants (like at courthouse self-help centers) or 
+with teams at legal service providers that give information to tenants who have just received a notice (at LASSD, we call it our Community Response Team).
+
+Legal Background
+What is the legal scenario?
+
+3 day notice
+Landlords or their attorneys prepare these & post them/deliver them to the tenant before they go to court to file a lawsuit.
+
+3 day notice
+San Diego County attorneys like at the self-help center use this attachment 4c to the UD-105 to raise procedural defenses, like a defective 3-day notice
+
+Notice Defect procedural defenses: for nonpayment of rent
+Defective 3-Day Pay or Quit Notice: The 3-day notice to pay or quit is defective because it (check all that apply): [ ] seeks more rent than was due at the time the notice was allegedly served, [ ] improperly includes late fees and/or sums other than rent, 
+[ ] fails to properly credit Defendant for amounts paid, 
+[ ] was allegedly served on a date before rent was late, thus the notice was premature, 
+[ ] fails to specify how, where, when and whom to pay,
+[ ] does not allow Defendant three days, excluding Saturdays, Sundays, and other judicial holidays, to pay the rent due.
+
+Things to look for “On the Face”
+From Ryan:  a good starting point for a notice analyzer is to scan a notice to pay rent or quit for defects that are apparent on the face of the notice. This is because other defenses, say habitability issues or whether there was a waiver of the notice, require an interview. Here are a list of defects that may appear on the face of the notice to pay rent or quit:
+
+The notice is not phrased in the disjunctive (i.e., it does not give the tenant the opportunity to pay rent or quit);
+The notice does not give the tenant three days, minus Saturdays, Sundays, and other judicial holidays, to pay or move out; 
+The notice does not state the amount of rent that is due (note: an interview is required to ascertain whether the notice seeks more rent than is due);
+The notice does not state the name, telephone, number, and address of the person to whom payment shall be made; 
+If payment can be made personally, the notice does not state the usual days and hours that the person will be available to receive payment);
+If payment can be made at a financial institution, the notice does not state the name and street address for the financial institution, or the account number, or the financial institution is not located within five miles of the address at issue; 
+If payment can be made by electronic funds transfer, the notice does not state that this method of payment was previously-established; 
+The notice seeks rent that came due more than a year ago; or
+The notice does not declare a forfeiture.
+
+
+Beware encouraging defenses on habitability
+From Ryan: 
+Habitability is a tricky defense because if, at trial, the tenant proves there are habitability issues, then the judge could order the tenant pay a reduced amount of rent within five days. If the tenant does not pay the reduced amount on time, then judgment is entered for Plaintiff. 
+
+There is risk with this outcome because the judge may not reduce the amount of rent as much as the tenant was hoping for and I don’t think tenants put the rent in an escrow account or otherwise have it available when it comes time to pay. Examples of waiver of the notice are when: (1) the landlord accepts rent from a tenant after serving a notice to pay rent or quit; (2) the landlord accepts rent from a tenant after any notice terminating a tenancy has expired; or (3) the landlord serves a new or different notice after the notice upon which the complaint is based has expired. These are solid defenses for a tenant and are defenses a tenant can prove up relatively easily (compared with discrimination, retaliation, or improper service of the notice, which are tough to demonstrate). 
+
+Legal basis for nonpayment notice req.s
+Code of Civil Procedure section 1161, paragraph 2, which lists the content requirements for notices to pay or quit:
+ 
+When the tenant continues in possession, in person or by subtenant, without the permission of the landlord, or the successor in estate of the landlord, if applicable, after default in the payment of rent, pursuant to the lease or agreement under which the property is held, and three days’ notice, excluding Saturdays and Sundays and other judicial holidays, in writing, requiring its payment, 
+stating the amount that is due, 
+the name, telephone number, and address of the person to whom the rent payment shall be made, and, 
+if payment may be made personally, the usual days and hours that person will be available to receive the payment (provided that, if the address does not allow for personal delivery, then it shall be conclusively presumed that upon the mailing of any rent or notice to the owner by the tenant to the name and address provided, the notice or rent is deemed received by the owner on the date posted, if the tenant can show proof of mailing to the name and address provided by the owner), or 
+the number of an account in a financial institution into which the rental payment may be made, and the name and street address of the institution (provided that the institution is located within five miles of the rental property), or  
+if an electronic funds transfer procedure has been previously established, that payment may be made pursuant to that procedure, or possession of the property, shall have been served upon the tenant and if there is a subtenant in actual occupation of the premises, also upon the subtenant.
+
+Service Vision
+What are the new workflows we need?
+
+What would happen, when the AI co-pilots join the team?
+
+Current WOrkflow: training
+PREPARING FOR THE INTERVIEW 
+After prepping the UD-105, Proof of Service, and Fee Waiver Request and Order, take a few minutes to review the complaint and the notice and gather some information before beginning the interview. 
+1.    Notice and lease attached? 
+The lease must be attached to the complaint unless the complaint is based on non-payment. The notice upon which the complaint is based must always be attached to the complaint, regardless of the cause of the eviction. If the notice (or lease, if required) is not attached to the complaint, mark the appropriate box on attachment 4c. 
+2.    When was the notice given? Where is the tenant being evicted? 
+Some attachments are only for use if the notice was given during certain time periods. Some are only for use if the tenancy is in a certain city.  
+3.    When did the notice expire? 
+Look at the notice attached to the complaint and determine when it was allegedly served on the CP. Look at the number of days that the notice gave to quit and look at a calendar to determine when that notice expired. 
+For purposes of a notice to pay or quit, only court days count. The first day, Day 1, is the first court day after the notice was served. The UD cannot be filed until Day 4. If the CP was served with a 3-day pay or quit notice on Monday, and there are no court holidays, Friday would be the first day the landlord could file. If instead the CP was served on a Saturday, then Monday, the first court day after the notice was served, would be Day 1, the CP would have until Wednesday to pay, and the landlord could file on Thursday (Day 4) at the earliest. For purposes of a 3-day quit notice for nuisance, crime, or waste, or a 30-day or 60-day notice, all days of the week count. However, the notice cannot expire on a weekend or court holiday. If it would, the next court day is the day of expiration. Remember that the suit cannot be filed until the day after the notice expires. 
+If the CP claims to have been served on a different day than the notice indicates, use the day the CP remembers being served to make your calculations. If the CP claims to never have received the notice at all, use the date on the notice, or if the notice is undated, the date listed as the date of service in the complaint. There are several boxes to check on 4c if the CP was never served with the notice.  
+
+You need to know when the notice expired because there are several defenses related to when things occurred - before or after the expiration of the notice.  
+4.   What is the tenant being evicted for? 
+Look at the notice and find the cause listed for the eviction. Is it non-payment? Nuisance? Owner move-in? Expiration of a fixed term lease? Removal from the rental market? Lease violation? No reason given? This is important as it will help you determine what defenses and attachments may be relevant.  
+5.   Forfeiture of the tenancy? 
+Look at the attached notice to see if there is language stating that the landlord declares a “forfeiture” of the agreement. That particular word must be used, though it may appear in different ways. If the language isn’t there, check the appropriate box on 4c. 
+6.   General or Specific denial? 
+Some complaints are done using the Judicial Council form (UD-100) and some are done on pleading paper. Either way, the summary of what the plaintiff is requesting will be towards the end of the document. Check to see if the plaintiff is requesting daily damages and from which date. For context, daily damages are calculated by dividing the monthly rent by 30.  
+If the total amount requested in the complaint (past due rent, if applicable, plus any damages) is more than $1,000, the defendant will need to specifically deny all the allegations in the complaint and the mandatory cover sheet. On the first page of the UD-105, 2(b)(1)(b), write in, “I specifically deny each and every allegation in the complaint.” Then in 2(b)(2)(c), write in, “I specifically deny each and every allegation in the Mandatory Cover Sheet and Supplemental Allegations – Unlawful Detainer (form UD-101).” 
+If the total amount requested is $1,000 or less, the defendant needs to generally deny the allegations in the complaint, etc. On the first page of the UD-105, check box 2(a). You do not need to type anything.  
+7.   Complaint verified? 
+Check to see if the complaint is verified. If an attorney is representing the plaintiff, there should be a separate piece of paper behind the complaint with a “verification” on it. If the plaintiff is self-represented, you will see the verification on the last page of the complaint. If the complaint is not properly verified, check the appropriate box on 4c.
+
+THE INTERVIEW 
+GENERAL RULE OF THUMB: WHEN IN DOUBT, CHECK THE BOX. 
+Remember that you cannot answer questions about whether a particular defense applies or does not apply. We will give the CP LASSD’s phone number before they leave. They may qualify for a free attorney who can discuss their case more fully and give them advice. When doing the interview and asking the following questions, you should be looking at the attachments, not the UD-105. 
+You must read this disclaimer to the CP before you start the interview: 
+“I will be asking you questions and checking boxes on a form based on what I understand to be the facts. I will be checking these boxes assuming that you want to raise any defenses that might apply. If you do not raise a particular defense now, you may not be able to raise that defense later. When we review the forms together, I will show you which defenses I marked and then we can remove anything you don’t want to include.” 
+1.   ATTACHMENT 3(t)(a)-(l) 
+“I’m going to ask you a series of questions and I just need you to say yes or no. You will have a chance to discuss the details later, but due to time constraints, we just need a yes or no for now.” 
+If the case is a non-payment case or the landlord is seeking daily damages, ask about defenses listed under 3a-3d. 
+3a: “I’m going to list a bunch of problems that may be present in your home. Say “yes” if a problem is present and “no” if it’s not. “Defective or unsafe electrical wiring?” Pause for answer, check the box if they say yes. “Lack of working heat?” Pause for answer, check the box if they say yes. “Defective plumbing?” Etc. 
+“Has a government agency been out to inspect the property?” If no (or I don’t know), skip to 3b. If yes, “do you know if the agency gave the landlord a notice saying they had to cure the habitability issues? How long ago?” If the landlord failed to cure the habitability issues before the deadline from the agency, check the box.   
+3b. “Have you paid for any repairs out of pocket?” If no, skip to 3c. If yes, check the box and ask “did you deduct this amount from your rent?” If yes, check the box. “What repairs did you pay for and how much did you spend on each repair?” List each repair and its cost. 
+3c. “Between [the date you received the notice] and [the date the notice expired], did you attempt to pay the full amount of rent due?” If yes, and the landlord refused to accept it, check the box and write in the date the CP attempted to pay the rent.  Remember that the CP will not necessarily know when the notice expired, and you will need to calculate the date the notice expired (see page 1 of this script for instructions).
+3d. Look at the notice. Check if the notice requests rent from more than a year from the date of service of the notice. If so, check the box and fill out the information. 
+For all types of evictions: 
+3e. “Did the landlord take any money from you after you received the notice? Did they say you could pay later? Did the landlord take any money from you after the notice expired? Did the landlord ever tell you to disregard or ignore the notice? Did you receive another notice after you received the notice attached to the complaint? Did the landlord say anything to make you believe you could continue living there despite having served you with the notice?” If the CP answers yes to any of these questions, check the appropriate boxes. 
+3f. “Do you think you’re being retaliated against for …” read all the options to the CP and mark as appropriate. If you check this box, you should also check “Unclean Hands” on attachment 3t(s).  
+3g. “Do you think you’re being discriminated against because of …” read all the options to the CP and mark as appropriate. If you check this box, check “Unclean Hands” on attachment 3t(s). 
+3j. “When was the last time your landlord accepted rent from you? What period of time did that rent payment cover?” If the landlord accepted rent for a period of time after the notice expired, check the box and fill in the details as indicated. 
+3k. “Do you think you’re being evicted because you, an immediate family member or someone in your home has been the victim of domestic violence, sexual assault, stalking, elder or dependent adult abuse, a crime where the victim experienced or was threatened with force or a deadly weapon or human trafficking?”  If no, move on. If yes, ask who the act was committed against and check the appropriate box(es). Then ask “can you provide a police report, protective order or restraining order listing you, your family member or household member as a victim, dated within the last 6 months?” If yes, check the box. If no, “Do you have, or could you get, a signed statement from a doctor, counselor, caseworker, or some other qualified third party confirming what happened?” If yes, check the box. If no, “can you provide any other documents or evidence to confirm the violence or abuse took place?” If yes, check the box. **If the CP cannot provide any of this documentation, do not include this defense. If CP can, ask “does the person who committed the abuse or violence live in your home?” Check the appropriate box.
+3l. “Were the police or emergency services ever called to your home?” If not, you are done with this attachment. If yes, “Do you think that might be why you’re being evicted?” If yes, check the box.  
+2.  ATTACHMENT 3t(h) SD NONPAYMENT OF RENT DUE ON OR AFTER JULY 1, 2022 (COVID-19-related City of San Diego Ordinance No. O-21293, passed 02/12/2021) 
+If the notice attached to the complaint is NOT based on non-payment of rent that accrued between July 1, 2022 and April 30, 2023 for a property located in the City of San Diego, skip this attachment entirely. 
+“Were you unable to pay rent that came due between July 1, 2022 and April 30, 2023 because of financial impacts related to COVID-19?” If the CP says “No,” skip the rest of this attachment. If the CP says “Yes,” ask the next question. 
+[1st Box] “Within 7 days of the rent coming due, did you provide written notice to your landlord that you were not able to pay the rent in full?” If “No,” skip to the 4th box. If “Yes,” check the box and ask the next question. 
+[2nd & 3rd Boxes] “Within 7 days of notice to your landlord, did your landlord ask for supporting documentation to verify your claim that you could not pay due to financial impacts of COVID-19?”  
+If the CP says “No,” check the 3rd box. 
+If the CP says “Yes,” ask “Did you provide the documentation within 14 days of the landlord’s request?” If “Yes,” check the 2nd box. 
+[4th Box] If the CP did not provide timely notice to the landlord or did not provide the supporting documentation requested, ask “Were you unable to provide timely notice to your landlord or to provide supporting documents because you were in the hospital or otherwise incapacitated?” If the CP says “Yes,” check the box. 
+[5th Box] “Is your landlord demanding late fees on rent due between July 1, 2022 and April 30, 2023 that is late due to financial impacts related to COVID-19?” If the CP says “Yes,” check the box. 
+
+3. ATTACHMENT 3t(h) CITY OF SAN DIEGO TENANT PROTECTION ORDINANCE (City of San Diego Ordinance No. O-21769, passed 02/27/2024)
+
+Facts Supporting Defense 3h - Additional Notice Requirements: “Did you receive a Notice to Tenant of Tenant Protections from your landlord, or a notice that the Residential Rental Unit is exempt from the San Diego Tenant Protection Ordinance?” If not, check the appropriate boxes. If so, “was the notice typed in 12-point font or larger?” If not, check the box. 
+
+Just Cause  
+If you have already examined the notice and know it does not allege a just cause reason, check the box. 
+
+At-Fault Just Cause: If the notice attached to the complaint is a 3-day non-curable notice for nuisance or some other lease violation, ask “Did you receive any other notices telling you to stop violating the lease before you received the notice attached to the complaint?” If no, check the box. 
+
+If the notice attached to the complaint is a curable notice for nuisance or some other lease violation, including non-payment of rent, ask “Did you receive a second 3-day non-curable notice to quit after receiving the notice attached to the complaint?” If no, check the box. 
+ 
+At Fault: Notice based on Failure to Vacate pursuant to Buyout Agreement: 
+If the notice states the tenant failed to vacate pursuant to a buyout agreement, ask “Did your landlord give you a written disclosure explaining your rights regarding a buyout agreement BEFORE making you a buyout offer (e.g. right not to agree, right to talk to an attorney, etc.)?” If no, check the box. If yes, ask “Did your landlord give you a copy of the disclosure, signed by the landlord and all tenants, within 3 days of signing?” If no, check the box. 
+
+The Plaintiff must meet ALL the following requirements for a Buyout Agreement. Ask the CP: “Was the Buyout Agreement in writing? Did your landlord give each tenant a copy of the Agreement when the tenant signed it?” If the tenant has the Buyout Agreement with them, review the document to answer the following questions. If you do not have access to the document, ask the CP:
+“Did the Agreement include the following statements in bold letters, at least 14-point font, and close to the tenant’s signature line: 
+‘You, the tenant, have a right not to enter into this buyout agreement.’ 
+A statement beginning with, ‘If you, the tenant, are entitled to relocation assistance…’ 
+‘You, the tenant, may choose to consult with an attorney before signing this agreement.’ 
+“Do you usually negotiate with the landlord in a language other than English?” If yes, “Did the landlord give you an English AND a translated version of the buyout agreement?” 
+If the answer to any of the above questions is no, check the appropriate boxes.  
+
+No Fault Just Cause:
+If the cause stated in the notice is Owner or Family Member Move-In:
+
+Review the notice. If it does not identify that the occupant(s) will be the owner or their spouse, domestic partner, children, grandchildren, parents, or grandparents, and that they will occupy the premises as their primary residence for a minimum of 12 months, check the box.
+
+Ask “Is your lease dated on or after June 24, 2023?” If yes, ask “Did you ever agree in writing, that the landlord could terminate the tenancy if they or their immediate family members wanted to move into the unit?” If no, ask “Does the lease allow the landlord to terminate the tenancy because the owner or owner’s spouse, domestic partner, children, grandchildren, parents or grandparents intend to move in?” If no, check the box. If the tenancy existed prior to June 24, 2023, ask “Was there an addition to your fixed term lease, lease renewal or a new lease allowing the landlord to terminate the lease because the owner or owner’s family member intend to move in?” If no, check the box. 
+Ask “Do you know if the intended occupant(s) currently live on the property or if there is similar unit on the property that is vacant?” If yes, check the box.
+Review the Notice. Does the notice include the name(s) of the intended occupant(s) and their relationship to the owner? If no, check the box.
+Review the Notice. Does the notice inform CP they may request proof that the intended occupant(s) are the owner or any of the family members listed above? If no, check the box.
+
+“Did you request proof that the intended occupant is the owner or related to the owner, and was this proof provided?” If the CP requested proof and it was not provided, check the box.
+If the cause stated in the notice is compliance with a government or court order and the order is attached, look at the order to determine if it requires the tenant to vacate for more than 30 days. If the order is not attached, ask “Does the order require you to vacate for more than 30 days?” If no, check the box.
+
+If the cause stated in the notice is Demolish or Substantial Remodel: 
+
+“Do you think the work to be performed requires you to vacate the unit for more than 30 days?” If no, check the box.
+
+Review the notice. If the work to be performed does not include replacing or substantially modifying structural, electrical, plumbing or mechanical systems that require a permit, check the box.
+
+Review the notice. If the work to be performed is not the abatement of hazardous materials, check the box.
+
+“Do you think you could continue living there without it being a violation of any health or safety laws?” If yes, check the box. “Do you think the work to be done is cosmetic only?” If yes, check the box. 
+
+ “Did your landlord post the application for the necessary permits at your residence within 3 business days of submitting the application? If no, check the box.
+
+“Did your landlord secure the necessary permits for demolition or substantial remodel before giving you a termination notice?” If no, check the box.
+
+Review the notice. If it doesn’t include the following, check the appropriate boxes.
+A statement of intent to demolish or substantially remodel? A statement that begins “If the substantial remodel of your unit or demolition of the property as described in this notice of termination is not commenced or completed the landlord must offer you…”? For substantial remodel: A description of the work to be completed and expected timeline? A copy of the permit(s) required? If no permit required, a copy of a signed contract with the hired contractor and details regarding the abatement of hazardous materials? For demolition: The expected date of demolition? A copy of the required permit(s)? For either: A statement that work cannot be safely completed without tenant vacating for at least 30 days? Certification under penalty of perjury? 
+ 
+No-Fault: Defective Notice: Review the notice and ask, “Did your landlord give you written notice at least 30 days (if the CP has lived in the premises less than a year) or 60 days (if the CP has lived in the home more than a year) before the date of termination?” If no, check the box. 
+ 
+If there is no notice, or the notice is not written in 12-point font or larger, check the box. 
+Review the notice. If the landlord did not provide a description of the no-fault reason for termination, check the box. 
+
+If the notice does not inform the tenant of their right to receive an offer to renew the tenancy in the event the residential rental unit is offered again for rent or lease for residential purposes within 5 years of the termination, check the box. (Does not apply to withdrawal from rental market.) 
+ 
+Relocation Assistance Payment/Rent Waiver: Ask “Did the landlord waive your rent or give you a direct payment within 15 days of the notice, to help with relocation?” If no, check the box.  
+
+Review the notice. The landlord could have chosen to provide rental assistance either through a Direct Payment or a Rent Waiver. Direct Payment: If the notice does not state the amount of relocation assistance available to the tenant and that Plaintiff shall provide the payment within 15 days from the date of the notice, check the box. Rent Waiver: If the notice does not state the amount of rent waived and that no rent is due for the corresponding months of the tenancy, check the box. 
+
+Amount of Direct Payment/Rent Waiver: If the landlord waived rent or gave the tenant a direct payment and the CP is under 62 and not disabled, ask “Was the amount equal to 2 months of the actual rent under your lease in effect at the date of the notice?” If no, check the box. If the CP is 62 or older OR is disabled, ask “Was the amount equal to 3 months of the actual rent under your lease in effect at the date of the notice?” If no, check the box. 
+
+Retaliation: Ask “Has your landlord threated you or taken any negative action against you for exercising or trying to exercise your rights under the Tenant Protection Ordinance?” If yes, check the box.
+4. ATTACHMENT 3t(h) – CITY OF CHULA VISTA RESIDENTIAL TENANT PROTECTION ORDINANCE (Chula Vista Municipal Code Ordinance No. 3527 / Chula Vista Municipal Code Section 9.65, passed 11/1/22, amended 2/20/24) 
+Check the box under Facts Supporting Defense 3h if you are using this attachment.
+Additional Notice Requirements: “Did you receive a Notice to Tenant of Tenant Protections from your landlord, or a notice that the Residential Rental Unit is exempt from the Chula Vista Tenant Protection Ordinance?” If not, check the appropriate boxes. If so, “was the notice typed in 12-point font or larger?” If not, check the box. 
+Just Cause  
+If the notice does not allege a just cause reason, check the box. 
+At-Fault Just Cause: If the notice attached to the complaint is a 3-day non-curable notice for nuisance or some other lease violation, ask “Did you receive any other notices telling you to stop violating the lease before you received the notice attached to the complaint?” If no, check the box. 
+
+If the notice attached to the complaint is a curable notice for nuisance or some other lease violation, including non-payment of rent, ask “Did you receive a second 3-day non-curable notice to quit after receiving the notice attached to the complaint?” If no, check the box. 
+No-Fault Just Cause:
+Owner or family member move-in.  Review the notice. If the notice does not state that the owner or the owner’s spouse, domestic partner, child, grandchild, parent, or grandparent will occupy the unit within 90 days after the tenant vacates for a minimum of 12 months as their primary residence, check the box. 
+“Is your lease dated on or after July 1, 2020?” If yes, “Did you ever agree in writing, that the landlord could terminate the tenancy if they or their immediate family members wanted to move into the unit?” If no, check the box. Ask “Does the lease allow the landlord to terminate the tenancy because the owner or owner’s family member intends to move in?” If no, check the box. 
+Review the notice. Does it include the name(s) of the intended occupant and their relationship to the owner? If no, check the box. Does it notify CP they can request proof that the owner or their family member(s) will occupy the unit? If no, check the box and ask “Did you request proof that the intended occupant is the owner or related to the owner, and was this proof provided?” If the CP requested proof and it was not provided, check the box.
+Intent to Demolish or Substantially Remodel. Review the notice. Is any structural, electrical, plumbing or mechanical system being replaced or modified? If no, check the box.
+Ask the following questions. If the answer is “no” or “I don’t know”, check the appropriate boxes. “Do you think the cost of improvements is less than $40 per square foot? Do you think the work can be done safely while you remain in the unit? Do you think the unit needs to be empty for more than 60 days for the work to be completed? Do you think the work to be done is cosmetic/minor?” 
+Review the Notice. Does it state the tenancy is terminated because of the Owner’s decision to substantially remodel or completely demolish the unit? If no, check the box.
+Ask “Does the notice require you to vacate on a day when you could continue living there without violating any laws?” If yes, check the box.
+Review the notice. If it does not contain a statement beginning “If the substantial remodel of your unit or demolition of the property as described in this notice of termination is not commenced or completed, the owner must offer you…”, check the box.
+For substantial remodel only. If the notice does not contain the following, check the appropriate boxes: a description of the work to be completed; the expected duration; a copy of the required permit(s) OR a copy of the signed contract with the hired contractor that details the work to abate hazardous materials; a notification that Defendant shall inform the owner if they are interested in reoccupying the unit when the work is done and Defendant shall provide their address, phone number and email address.
+For intent to demolish only. If the notice does not contain the expected date of demolition and a copy of the required permit(s), check the appropriate boxes.
+No-Fault, Residential Rental Complex with 3 or more units 
+If the property is a Residential Rental Complex (one or more buildings located on a single lot, lots that touch one another, and/or lots separated only by a street or alley, containing 3 or more residential rental units owned or rented by the same Owner), check the box. If the property is not in a Residential Rental Complex with 3 or more units, skip to No-Fault, Residential Rental Complex with 2 or fewer units.  
+Defective Notice: Review the notice and ask, “Did your landlord give you written notice at least 30 days (if the CP has lived in the premises less than a year) or 60 days (if the CP has lived in the home more than a year) before the date of termination?” If no, check the box. 
+If there is no notice, or the notice is not written in 12-point font or larger, check the box. 
+If the landlord did not provide a description of the no-fault reason for termination, check the box. 
+Relocation Assistance Payment/Rent Waiver: Ask “Did the landlord give you a direct payment or waive your rent to help with relocation?” If no, check the box. Ask “Did the landlord provide a direct payment within 15 days of serving the notice?” If no, check the box. Review the notice, and if the notice does not state the amount of rent waived and that no rent is due for the final months of the tenancy, check the box. 
+Page 2: Relocation Assistance continued: Look at the CP’s zip code on the chart below and compare this amount with the CP’s actual rent at the time of the notice. Using the greater amount, calculate what the rent would be for 2 months. If the landlord did not provide a direct payment or rent waiver equal to that amount, check the box. If the Tenant is 62-years or older, or disabled, do the same calculation for 3 months. If the landlord did not provide a direct payment or rent waiver equal to that amount, check the box. 
+
+No Fault Only: Right to Receive an Offer to Renew: If the notice does not inform the tenant of their right to receive an offer to renew the tenancy if the unit is offered for rent within the next 2 years, check the box. 
+Notice to the City of Chula Vista: Ask CP, “Do you know if your landlord submitted the correct form to the City of Chula Vista, notifying the city of the No-Fault termination, within 3 business days of serving the notice on you?” If the answer is no or they do not know, check the box to preserve the defense. 
+No-Fault, Residential Rental Complex with 2 or fewer Units 
+Defective Notice: Review the notice and ask, “Did your landlord give you written notice at least 30 days (if the CP has lived in the premises less than a year) or 60 days (if the CP has lived in the home more than a year) before the date of termination?” If no, check the box. 
+If there is no notice, or the notice is not written in 12-point font or larger, check the box. 
+If the landlord did not provide a description of the no-fault reason for termination, check the box. 
+Relocation Assistance Payment/Rent Waiver: Ask “Did the landlord give you a direct payment or waive your rent to help with relocation?” If no, check the box. Ask “Did the landlord provide a direct payment within 15 days of serving the notice?” If no, check the box. Review the notice, and if the notice does not state the amount of rent waived and that no rent is due for the final months of the tenancy, check the box. 
+Relocation Assistance (Direct Payment or Rent Waiver): If the landlord provided relocation assistance in the form of a direct payment or rent waiver, ask CP “was the amount equal to one month’s rent?” If not, check the box.  
+Notice to the City of Chula Vista: Ask CP, “Do you know if your landlord submitted the correct form to the City of Chula Vista, notifying the city of the No-Fault termination, within 3 business days of serving the notice on you?” If the answer is no or they do not know, check the box to preserve the defense. 
+Anti-Harassment and Retaliation Protections 
+(DO NOT USE FOR MOBILE HOME TENANT) 
+Ask the following and mark the boxes accordingly: Please answer yes or no to the following questions. “Has the Landlord or an agent, contractor, or employee of the landlord: Disrupted, ended, or failed to provide housing services? Failed to perform maintenance or repairs? Failed to make reasonable efforts to complete maintenance or repairs? Abused their right to lawfully access your residence? Been verbally abusive or offensive in a way likely to provoke an immediate reaction? Tried to get you to move by using intimidation, coercion, or fraud? Threatened you with physical harm? Discriminated against you? Tried to end your tenancy based on inaccurate facts or law? Interrupted your quiet use and enjoyment of the property? Refused to accept or acknowledge your rent payment?” If refusal was due to the pending UD, do not check this box. “Interfered with your right to privacy? Retaliated against you because you exercised your rights under this Ordinance?”  
+
+
+
+5. ATTACHMENT 3t(h) – COUNTY OF SAN DIEGO RESIDENTIAL EVICTION BAN AND RENT INCREASE CAP (ORDINANCE NO. 10887) 
+(Urgency Ordinance for Flood affected areas) 
+ 
+Use this attachment if the Notice was served between January 22, 2024 and March 31, 2024 OR expires between January 22, 2024 and March 31,2024 OR the Complaint was filed between January 22, 2024 and March 31,2024 AND the property is located in one of the following Flood Affected Areas: 92113 (San Diego), 91977 (Spring Valley), 91950 (National City), 92114 (San Diego), 92102 (San Diego), 92115 (San Diego), 91945 (Lemon Grove), 92118 (Coronado) or 92104 (San Diego). Check the applicable zip code in the attachment. 
+ 
+“Did you suffer Economic Loss such as reduced income or increased expenses due to the flood that occurred on January 22, 2024?” (This might include lost wages, damage to property or a need to relocate.) If yes, check the box.
+
+Look at the Notice. Is the reason for termination due to Defendant causing an immediate and serious threat to a person’s health or safety? If yes, skip this box. If no, ask the follow up question, “Do you believe the landlord knew or should have known that you suffered Economic Loss?” If yes, check the box. 
+ 
+Look at the Notice. Does it include specific facts regarding the basis for the eviction (i.e. what occurred, when, where, who was present)? If no, check the box.  
+ 
+“Did you have to move out of your unit so repairs could be made?” If no, skip this question. If yes, ask the follow up question, “Did your landlord provide you with relocation assistance?” If no, check the box. 
+ 
+“Did your landlord raise your rent betweenJanuary 22, 2024 and March 31, 2024?” If yes, ask how much and calculate the percentage – currently 5.2%). If the increase was more than 5.3%, check the box. If rent was not raised or below 5.3%, skip this box. 
+ 
+“Do you believe your landlord is retaliating against you for exercising your rights under this Ordinance, or has tried to prevent you from acquiring rights under this Ordinance?” If yes, check the box. 
+
+
+
+6.  ATTACHMENT 3(t)(i) TPA JUST CAUSE 
+“How long have you lived in this residence?” If less than 12 months, ask, “Is there anyone living in your home who has lived there for longer than 24 months?” If yes, review the potential defenses with the clinic participant. If no, skip this attachment entirely.  
+If you have already examined the notice and know it does not allege a just cause reason, check the box. 
+Owner move-in: Review the Notice. If the notice does not identify that the occupant(s) will be the owner or their spouse, domestic partner, children, grandchildren, parents, or grandparents, and that they will occupy the premises as their primary residence for a minimum of 12 months, check the box.
+If the lease is dated on or after July 1, 2020 (or July 1, 2022, for a mobilehome), ask, “Did you ever agree, in writing, that the landlord could terminate the tenancy if they or their immediate family members wanted to move into the unit?” If no, ask “Does the lease allow the landlord to terminate the tenancy because the owner or owner’s spouse, domestic partner, children, grandchildren, parents or grandparents intend to move in?”, check the box. 
+Ask “Do you know if the intended occupant(s) currently live on the property or if there is similar unit on the property that is vacant?” If yes, check the box.
+Review the Notice. Does the notice include the name(s) of the intended occupant(s) and their relationship to the owner? If not, check the box.
+Review the Notice. Does the notice inform CP they may request proof that the intended occupant(s) are the owner or any of the family members listed above? If no, check the box. Ask “Did you request proof of the relationship between the owner and intended occupant(s)? If no, move on. If yes, ask “Was proof provided?” If no, check the box.
+Substantial remodel: “Do you think the work to be performed requires you to vacate the unit for more than 30 days?” If no, check the box. 
+“Do you think the work to be done is minor or cosmetic and can be performed safely while you remain in the home?” If yes, check the box.  
+Review the notice. If it does not include the following, check the appropriate boxes: a statement that the owner intends to demolish or substantially remodel the rental unit property; a statement beginning with “If the substantial remodel of your unit or demolition of the property as described in this notice of termination is not commenced or completed, the owner must offer you…”. For substantial remodel: a description of the substantial remodel to be completed; the approximate expected duration of the substantial remodel; a copy of the permit(s) required to undertake the substantial remodel OR a copy of the signed work contract with the hired contractor that details the work to be performed to abate hazardous materials; a notification that CP shall inform the owner if they are interested in reoccupying the rental unit following the substantial remodel and shall provide their address, phone number and email address to the owner. For demolition: the expected date of completion of the demolition; a copy of the permit(s) required for demolition.
+If the cause listed is a “no-fault just cause” (e.g. owner move-in, substantial remodel, removal from the rental market, etc.), ask, “Did the landlord ever provide you with a relocation payment, either by sending you money (equivalent to a month’s rent) or by waiving your last month’s rent?” If no, check the box. 
+No-fault: Check the notice for language notifying the CP of their right to relocation payments or a rent waiver. If that language is not present, check the box. 
+No-fault: If there is language in the notice notifying the CP that the landlord elects to waive the last month’s rent, but it fails to state the amount of rent waived or that no rent was due for the final month of tenancy, check the box. 
+No-fault: If the notice does not list an amount of relocation assistance or rent waiver equal to one month’s rent, check the box. If the notice indicates that the landlord elected to provide the relocation payment directly (not waiving the last month’s rent), ask “Did you receive a relocation payment from your landlord within 15 calendar days of receiving the notice?” If no, check the box. 
+At-fault: If the notice attached to the complaint is a 3-day non-curable notice for nuisance or some other lease violation, “Did you receive any other notices telling you to [stop violating the lease] before you received the notice attached to the complaint?” If no, check the box. 
+At-fault: If the notice attached to the complaint is a curable 3-day notice for a lease violation, “Did you receive a second three-day notice to quit after receiving the notice attached to the complaint?” If no, check the box. 
+Both no-fault and at-fault, “just cause” protections: 
+“Did you ever receive any notice from your landlord that your tenancy is or is not subject to the ‘just cause’ protections of the Tenant Protection Act?” If no, review the lease for the language indicated in the defense. If the language is not there and the lease was signed on or after July 1, 2020, (or July 1, 2022 for a mobilehome) check the first two boxes. 
+“Did you negotiate your rental agreement in Spanish, Chinese, Tagalog, Vietnamese or Korean?” If yes, ask “Did your landlord provide a translation of the notice or lease provision described above in that language? If no, check the box.
+If the property is a single-family home, condominium or a mobilehome, ask “Did your landlord provided you with a notice including a statement that begins “This property is not subject to the rent limits imposed by Section 1947.12 of the Civil Code…”? If no, check the box.
+If the tenancy began or renewed on or after July 1, 2020 (or July 1, 2022 for a mobilehome) ask “Did the landlord provide the above-described notice in the rental agreement?” If no, check the box.
+7.   ATTACHMENT 3(t)(i) TPA RENT CAP 
+“Has your landlord raised your rent since March 15, 2019?” If no, you can skip this attachment entirely. If yes, check the first box.
+If yes, ask, “Do you live in a single-family home, condo, or mobilehome?” If no, skip this question and go to the next question. If yes, ask, “Have you ever received a notice from your landlord that your tenancy was not subject to the Tenant Protection Act?” If the clinic participant says “no,” or “I don’t know,” check the box. Ask, “Did you start or renew your tenancy after July 1, 2020 (or July 1, 2022, if they live in a mobilehome)?” If yes, check the box.
+“Regarding the rent increase, what was your rent before the increase and what was your rent after?” If the clinic participant can’t remember the exact figures but they’re able to give you an estimate, use their estimate. You will then need to do a quick calculation to determine the rental increase percentage. If the landlord raised the rent more than the percent listed here, mark the appropriate defense on the Answer attachment, and mark 3i(5), or 3i(4) if the only unpaid rent is the unauthorized amount (any amount over the max percent raise), and mark "Defective 3-Day Pay Rent or Quit Notice" on Attachment 4c. 
+
+August 1, 2019 to July 31, 2020………7.2% 
+August 1, 2020 to July 31, 2021	………6.8% 
+August 1, 2021 to July 31, 2022	………9.1% 
+August 1, 2022 to July 31, 2023	………10% 
+August 1, 2023 to July 31, 2024	………10% 
+August 1, 2024 to July 31, 2025	………8.6%
+August 1, 2025 to July 31, 2026	………8.8%
+If the rent increase was between March 15, 2019 and January 1, 2020, ask, “On or before January 1, 2020, did your landlord "roll back," or lower, your rent?” If no, mark the appropriate defense: Check the second to last box of the Attachment page if the clinic participant lived at the unit since before March 15, 2019. Check the last box of the Attachment page if the client lives in a mobilehome and has lived there since before February 18, 2021. Mark 3i(5) on the UD-105, or 3i(4) if the only unpaid rent is the unauthorized amount, and mark "Defective 3-Day Pay Rent or Quit Notice" on Attachment 4c. 
+If the tenancy is in a mobilehome and the rent increase was between February 18, 2021 and January 1, 2022, ask, “On or before January 1, 2022, did your landlord "roll back," or lower, your rent?” If no, mark the appropriate defense on the Answer attachment, and mark 3i(5) on the UD-105, or 3i(4) if the only unpaid rent is the unauthorized amount, and mark "Defective 3-Day Pay Rent or Quit Notice" on Attachment 4c. 
+“Has your landlord raised your rent more than twice in a twelve-month period since March 15, 2019 (or since February 18, 2021 for a mobilehome)?” If yes, mark the appropriate defense on the Answer attachment, and mark 3i(5) on the UD-105, or 3i(4) if the only unpaid rent is the unauthorized amount, and mark "Defective 3-Day Pay Rent or Quit Notice" on Attachment 4c. 
+If the tenancy is a sublease, ask “Do you know what the rental amount is for the premises?” If yes, and the rental amount in the sublease exceeds the allowable rental amount for the premises based on the percentages above, check the box.
+“Did you receive at least 30 days written notice of the rent increase before the rent increase took effect?” If the rent increase was greater than 10% ask “Did you receive 90 days written notice of the rent increase before the rent increase took effect?” If no, mark the appropriate defense on the Answer attachment, and mark 3i(5) on the UD-105, or 3i(4) if the only unpaid rent is the unauthorized amount, and mark "Defective 3-Day Pay Rent or Quit Notice" on Attachment 4c.  
+8.   3(t)(s) OTHER AFFIRMATIVE DEFENSES AND SUPPORTING FACTS 
+Waiver/Estoppel 1: If the CP is being evicted for a lease violation (not related to non-payment) like having a pet without permission or noise complaints, etc. check this box if the landlord accepted rent after the landlord learned about the alleged lease violation. 
+Look at the notice attached to the complaint to determine the breach the CP is supposedly being evicted for. For example, subletting the residence without the landlord’s permission: “How long has [the unauthorized resident] been living in the apartment? Has the landlord known about it the whole time? When did they find out? Have they accepted rent since they found out [unauthorized resident] was living there?” If the CP confirms the landlord accepted rent after they learned about the alleged lease violation, check the box. 
+Waiver/Estoppel 2: If the CP is being evicted for non-payment. “Since moving into this residence, have you ever paid your rent late before?” If yes, check the box. 
+Successor in Interest: If the CP is being evicted for non-payment, ask, “Has there been a recent change in ownership of the building?” If no, skip this defense. If yes, “Did you receive new instructions on how to pay rent to your new landlord or property manager?” If yes, skip this defense. If no, check the box. 
+Unable to Contact: If the CP is being evicted for non-payment, ask, “After receiving the notice to pay or quit, were you able to contact your landlord?” If CP was unable to contact/reach the landlord, check the box. If CP had no problem contacting their landlord (or they didn’t attempt to contact the landlord), skip the defense.  
+Unclean Hands: Ask, “Since serving you with the notice attached to the complaint, has your landlord ever done anything dishonest or improper?” If yes, check the box. If no, skip the defense. 
+Third-Party Rent: If the CP is being evicted for non-payment, ask, “Has your landlord ever refused to accept rent from a third party on your behalf? For example, have you recently tried to get rental assistance from the City or County and your landlord refused to cooperate with the process?” If yes, check the box and check 3(q) on the UD-105. If the CP can’t think of any time where a third party attempted to pay their rent, skip the defense.  
+Qualified Disability: “Do you have any disabilities?” If no, skip the defense. If yes, ask, “Have you ever asked your landlord to allow you extra time to pay your rent or to change (or make an exception to) some policy due to your disability?” If no, skip the defense. If the CP says they did request a reasonable accommodation and their landlord refused to work with them, check the appropriate box as well as 3g (regarding disability discrimination) on attachment 3t(a-l). Also check 3(g) and 3(r) on the UD-105. 
+Post-Foreclosure 1: If this is a post-foreclosure case, check the notice to see if there are multiple time periods listed in the notice attached to the complaint. If there are, check the box. If not, skip the defense.  
+Post-Foreclosure 2: If this is a post-foreclosure case, ask, “Are you the mortgagor (meaning borrower) of the unit?” If yes, you can skip the rest of the defenses on this attachment. If no, ask, “Does the former property owner (person listed on the mortgage) live in the residence?” If yes, you can skip the rest of the defenses on this attachment. If no, consult the lease to determine whether the agreement was a month-to-month tenancy, periodic tenancy, or fixed-term lease that has not yet expired. Check the appropriate box(es). 
+Post-Foreclosure 3: If this is a post-foreclosure case, ask, “Are you the child, spouse, or parent of the prior mortgagor?” If yes, skip the defense and move on to the next attachment. If no, consult the lease to determine whether the agreement was a month-to-month tenancy, periodic tenancy, or fixed-term lease that has not yet expired. Check the appropriate box(es). 
+9.   ATTACHMENT 4c - OTHER STATEMENTS 
+Defective 3-Day Pay or Quit: Look at the notice. “Is [the amount of rent listed on the notice attached to the complaint] the amount you normally pay? It says here that you owe rent for [the months listed]. Does that sound right? Did the landlord fail to credit you for any amounts you paid? Have you paid late fees in the past? (If yes, check the box for “seeks more rent than was due...” and “fails to properly credit…”)  “Does the amount the landlord is requesting include any late fees, utilities, or anything other than past due rent?” “what day of the month is rent late?” If the notice was served before the rent was late, then mark the appropriate box. Check the appropriate box(es). 
+Review the notice and determine whether it specifies how, where, when, and to whom rent should be paid. If not, check the appropriate box. 
+Defective 3-Day Notice to Perform or Quit: If the notice is a “perform or quit” notice, check the box to preserve this defense. 
+Improper Service of Notice: “How did you receive the notice?” Make sure the CP understands that you’re asking them about the notice, not the summons and complaint. For service to have been “proper,” the CP must have either: 
+Received the notice by hand; OR 
+The notice was left with a person of suitable age and discretion at the CP’s home or place or business AND the CP received a copy in the mail; OR 
+The notice was posted somewhere obvious on their property AND the CP received it in the mail.  
+“Is the notice attached to the summons and complaint exactly the same as the notice you received initially?” If yes, skip the defense. If no, check the box. 
+*Forfeiture of the Tenancy: Look at the notice to determine if there is language stating that the landlord declares a “forfeiture” of the agreement. That particular word must be used, though it may appear in different ways. If the language isn’t there, check the appropriate box. 
+Non-Payment Only: “Did you pay the rent that was due between the time you received the notice and the time the notice expired?” If yes, check the box.  
+Filed too early: If the complaint was filed before the notice served on CP expired (or if the notice was never served at all), check the appropriate boxes. If the notice was improperly served, check both boxes related to this defense because if a notice is not properly served, then it does not expire and no cause of action accrues. 
+*Lease/Notice Attached: If the complaint is based on non-payment, the lease does not need to be attached. If the complaint is based on something other than non-payment, the lease must be attached. The notice upon which the complaint is based must always be attached to the complaint, regardless of the cause of the eviction. If the notice (or lease, if required) is NOT attached to the summons and complaint, check the box. 
+Section 8: If the CP receives Section 8, check ALL of the Section 8 boxes to preserve those defenses. 
+Post-Foreclosure 4: If this is a post-foreclosure case, ask, “Do you know when the deed after foreclosure was recorded?” If not, there may be a copy of the recorded deed attached to the complaint. If there is, check the deed and determine whether it was recorded prior to service of the notice to quit. If it was, skip the defense. If not, check the box. If the CP doesn’t know when the deed was recorded and the deed is not attached to the complaint, there is no way to determine whether this defense applies, so check the box to preserve the defense. 
+
+
+New workflow
+A tenant comes into the Help Center or Clinic
+They present the intake staff member with all the documents they have (or given case access lookup details to pull documents from the court registry)
+The staff member finds the 3-Day Notice and uploads/scans it into the AI tool
+The AI tool analyzes it for on-the-face defects and possible follow up questions
+The AI tool gives the staff member and tenant a readout of Green-Yellow-Red defects detected, and an explanation of why
+The AI tool recommends which defenses to check off on the UD-105, and gives talking points, details & citations to support this.
+The AI tool recommends which additional questions to ask
+
+User (tenant or clinic staff) opens the tool.
+Tool says something like:
+“Upload a clear photo or PDF of your 3-Day Notice to Pay Rent or Quit (rent notice). I’ll scan it for possible problems and give you a checklist you can discuss with a lawyer.”
+
+User uploads the notice and optionally types a question (“Do I have any defenses?”).
+Tool workflow: 
+User Uploads & initiates
+
+Solution does a quick classification and then responds:
+
+Confirms this looks like a 3-Day Notice to Pay Rent or Quit in California.
+
+If not, it gently says “this tool is only for nonpayment 3-day notices” and stops.
+
+If yes, it continues:
+
+“I’ll check your rent notice for possible problems. I’ll ask a few yes/no questions to fill in the gaps.”
+Tool workflow: 
+Document Confirmation
+
+Tool workflow: 
+Silent Parsing & Auto-checks 
+Behind the scenes the solution:
+Reads the notice text.
+Extracts: notice date, service date (if any), total amount, months covered, payee info, payment instructions, any forfeiture language.
+Runs all the “on-the-face” statutory checks from notice_defect_rules_nonpayment and ccp_1161_2_plain_language_summary
+disjunctive “pay or quit”
+amount stated
+payee name/phone/address
+days/hours, bank info, EFT language, forfeiture language, etc.
+Temporarily stores this as preliminary_notice_analysis.
+User doesn’t see this yet.
+
+Tool workflow: 
+Short Targeted Interview
+Now the solution  asks only what it still needs to answer the remaining rules (using clinic_interview_scrip:
+Group A – Amount vs demanded / credits
+Group B – Late fees / non-rent charges
+Group C – Service date, rent-late date, three court days
+Group D – Payment instructions clarity
+For clinic staff, you can show the exact questions from your script; for tenants, you can keep it very plain-language.
+Example:
+“I’m going to ask a few quick questions about the rent and the dates. You can say yes/no and give short answers; you can explain more later with a lawyer.”
+It asks ~6–10 questions max, not the full mega-script.
+
+Tool workflow: 
+Final Defect Decisions
+Using:
+Parsed notice data
+User’s answers
+ca_three_day_notice_court_days_cheatsheet for date counting
+notice_defect_rules_nonpayment_v
+…the GPT fills in all defect keys with yes / no / unclear and a short basis.
+This becomes the internal NoticeAnalysis object for this notice.
+
+Tool workflow: 
+Map Defects → Attachment 4c Checkboxes
+The solution then maps the internal keys to your actual 4c form:
+Block 1: Defective 3-Day Pay or Quit Notice
+“seeks more rent than was due” ← seeks_more_rent_than_due
+“improperly includes late fees and/or sums other than rent” ← includes_late_fees_or_other_sums
+“fails to properly credit Defendant for amounts paid” ← fails_to_credit_amounts_paid
+“was allegedly served on a date before rent was late…” ← served_before_rent_was_late
+“fails to specify how, where, when and whom to pay” ← combination of fails_to_specify_payment_details + missing_payee_name_phone_address + missing_personal_payment_days_hours + missing_bank_payment_details_or_not_within_5_miles
+“does not allow Defendant three days…” ← does_not_allow_three_court_days + missing_three_court_days_language_or_deadline
+Other 4c lines (v1 you can support a few; v2 add more):
+“The notice does not provide for forfeiture of the tenancy as a remedy.” ← missing_forfeiture_declaration“Improper Service of Notice” ← later: a short service interview to decide if 1162 was followed.
+“Before the 3-day notice to pay or quit expired, Defendant paid the rent…” ← from amount/credits interview if tenant says “I fully paid before the deadline date.”
+“The unlawful detainer complaint was filed before the notice…expired / no cause of action accrued…” ← if they upload the complaint and you compare complaint filing date vs 3-day period using the same court-day logic.
+
+
+Tool workflow: 
+Show Summary Results to User
+The solution responds with two layers:
+Human summary
+ Summary – Possible Issues With Your 3-Day Rent Notice • The amount demanded may include late fees or charges other than base rent. • The notice may not clearly give you three court days to pay. • The notice may be missing payee contact information. These are possible issues you can discuss with a legal aid attorney or court self-help center. I’m not a lawyer and this isn’t legal advice.
+
+
+Tool workflow: 
+Prep Attachment 4c Documentation
+The GPT provides Attachment 4c checklist Either as a structured JSON object that your web app converts into a filled PDF, or  mark-up like:
+**Attachment 4c – boxes you may be able to check (for your lawyer to review):**
+
+[x] Defective 3-Day Pay or Quit Notice – because:
+    - [x] seeks more rent than was due at the time the notice was allegedly served
+    - [ ] improperly includes late fees and/or sums other than rent
+    - [x] fails to properly credit Defendant for amounts paid
+    - [ ] was allegedly served on a date before rent was late, thus the notice was premature
+    - [x] fails to specify how, where, when and whom to pay
+    - [x] does not allow Defendant three days, excluding Saturdays, Sundays, and judicial holidays, to pay the rent due
+
+[ ] The notice does not provide for forfeiture of the tenancy as a remedy.  
+ Plus a short “why” next to each checked sub-box, and the statute/ordinance reference (e.g., “under CCP 1161(2)”).
+
+
+
+Tool workflow in full
+Upload handling
+Accept image/PDF.
+Run OCR (OpenAI vision / other) → text.
+Document classifier
+Small LLM call: “Is this a 3-Day Notice to Pay Rent or Quit for nonpayment in CA?”
+Extract: notice type, dates, amounts, payee info, payment instructions, forfeiture clause.
+Pre-analysis
+Run all statutory facial checks using ccp_1161_2_plain_language_summary.md + notice_defect_rules_nonpayment_v2.md.
+Fill out the statutory keys with provisional answers.
+Interview planner
+Compare which keys are still "unclear" or depend on tenant info.
+Generate a minimal list of questions from clinic_interview_script_for_six_items.md.
+Ask them in a short turn; store answers.
+Final analysis
+Use tenant answers + cheat sheet to finalize the amount & timing keys.
+Revisit statutory keys if tenant answers clarify anything.
+NoticeAnalysis object
+Build a JSON like:
+{
+  "metadata": {...},
+  "defects_amount_and_timing": {...},
+  "defects_statutory_ccp_1161_2": {...}
+}
+ This is your intermediate analysis that you can reuse internally, log for research, or feed into other tools.
+4c-mapper
+Deterministic mapping function that takes NoticeAnalysis and returns:
+which 4c top-level boxes to check, and
+which sub-bullets under “Defective 3-Day Pay or Quit Notice” to check.
+Presentation layer
+GPT writes the:
+Plain-language summary
+Markdown version of Attachment 4c checklist
+Optional citations “This comes from CCP 1161(2)” etc.
+
+
+Data Wishlist
+What data do we need to train & evaluate AI tools to do these tasks?
+
+Why do we need this data
+Show good examples to the system and the development team, to learn how to produce quality work product. Also, so these good examples can be replicated.
+Show bad examples to know what to avoid.
+Test systems to see if they can produce work product at/above this level.
+* We only want data that is fictionalized, so to reduce risks around personally identifiable information.
+
+Common Notice Templates
+From the county/region’s most common landlords, landlord attorneys, and property managers
+NOtices & UD-105s
+How a certain notice-defect would then translate into the UD-105 or other case documents being produced
+List of defects
+Including on-the-face defects and defects that can only be identified with data from the user or a 3rd party. 
+UD-105 Service Scripts
+How service providers are trained to ask about the Notice, explain things, ask about defect-related questions, and communicate with litigants.
+Good/Bad Notices
+Examples of notices with no defects, with many defects, with 1 defect, and with on-the-fence defects. These can help train the system.
+Annotated Bad Notice
+Have an expert detail exactly what they are looking at and using to analyze the fields, how they are deciding that a defect is present
+
+Work Product Evaluation Standards
+How can we tell if the AI agent has done a good job at this legal task?
+
+Helping the Legal Team analyze the tenant’s situation
+….
+…
+Signs the tool has done a Good Job
+….
+…
+Signs the tool has done a Bad Job
+
+Overall Goals & Measuring Success
+What are we aiming to do?
+
+Policy Impact Goals
+Help more Californians avoid eviction by spotting procedural defenses they can use in the lawsuit, including a defect in the warning notice they were given.
+
+Total Addressable Market
+How many people nationwide could benefit from better access to procedural defenses for eviction lawsuits?
+
+…
+Service Obtainable Market
+How many people in the organization’s jurisdiction could benefit from spotting procedural defenses on their notice?
+
+…
+Pilot Service Targets
+How many people could be served if we piloted this with our partner organization?
