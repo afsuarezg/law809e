@@ -65,7 +65,7 @@ class LLMNoticeGenerator:
         """Return (text, stem) for a randomly chosen template file."""
         if self._template_files:
             path = random.choice(self._template_files)
-            return path.read_text(), path.stem
+            return path.read_text(encoding="utf-8"), path.stem
         return self._default_template, "default"
 
     def _get_default_model(self) -> str:
