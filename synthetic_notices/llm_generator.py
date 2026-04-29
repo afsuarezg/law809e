@@ -8,9 +8,9 @@ Supports multiple LLM providers (OpenAI, Anthropic, etc.).
 import os
 import random
 import json
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import List, Optional, Dict, Any
-from datetime import date, timedelta
 
 # Load environment variables from .env file
 try:
@@ -56,17 +56,18 @@ class LLMNoticeGenerator:
         if seed is not None:
             random.seed(seed)
         
-        # Build list of available template files in templates_text/; selection happens per notice
-        templates_dir = Path(__file__).parent / "templates" / "templates_text"
+        # Build list of available template files; selection happens per notice
+        templates_dir = Path(__file__).parent / "templates" / "templates_text" / "templates_without_blanks"
         self._template_files = list(templates_dir.glob("*.txt"))
         self._default_template = self._get_default_template()
 
     def _pick_template(self):
-        """Return (text, stem) for a randomly chosen template file."""
+        """Return (text, filename, created_date) for a randomly chosen template file."""
         if self._template_files:
             path = random.choice(self._template_files)
-            return path.read_text(encoding="utf-8"), path.stem
-        return self._default_template, "default"
+            created = datetime.fromtimestamp(path.stat().st_ctime).strftime("%Y-%m-%d")
+            return path.read_text(encoding="utf-8"), path.name, created
+        return self._default_template, "default", None
 
     def _get_default_model(self) -> str:
         """Get default model for provider."""
@@ -112,7 +113,7 @@ Property Manager, Coastal Bay Properties, LLC"""
 
     def generate_valid_notice(self, **kwargs) -> GeneratedNotice:
         """Generate a valid notice using LLM."""
-        template_text, template_file = self._pick_template()
+        template_text, template_file, template_created_date = self._pick_template()
         prompt = self._build_valid_prompt(template_text, **kwargs)
         response = self._call_llm(prompt)
         parsed_response = self._parse_json_response(response)
@@ -122,6 +123,7 @@ Property Manager, Coastal Bay Properties, LLC"""
             defects=[],
             is_valid=True,
             template_file=template_file,
+            template_created_date=template_created_date,
         )
 
     def generate_invalid_notice(
@@ -130,7 +132,7 @@ Property Manager, Coastal Bay Properties, LLC"""
         **kwargs
     ) -> GeneratedNotice:
         """Generate a notice with specific defects using LLM."""
-        template_text, template_file = self._pick_template()
+        template_text, template_file, template_created_date = self._pick_template()
         prompt = self._build_defect_prompt(defects, template_text, **kwargs)
         response = self._call_llm(prompt)
         parsed_response = self._parse_json_response(response)
@@ -151,6 +153,7 @@ Property Manager, Coastal Bay Properties, LLC"""
             defects=final_defects,
             is_valid=False,
             template_file=template_file,
+            template_created_date=template_created_date,
         )
 
     def generate_random_invalid_notice(

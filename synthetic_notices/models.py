@@ -64,6 +64,7 @@ class GeneratedNotice:
     defects: List[DefectType]
     is_valid: bool
     template_file: Optional[str] = None
+    template_created_date: Optional[str] = None
 
     def to_dict(self) -> dict:
         result = {
@@ -71,6 +72,7 @@ class GeneratedNotice:
             "defects": [d.value for d in self.defects],
             "is_valid": self.is_valid,
             "template_file": self.template_file,
+            "template_created_date": self.template_created_date,
         }
         
         # Add metadata if data is available (rule-based generator)

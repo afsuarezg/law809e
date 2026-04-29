@@ -220,6 +220,11 @@ def main():
         help="Random seed for reproducibility"
     )
     parser.add_argument(
+        "--append",
+        action="store_true",
+        help="Append new notices to an existing output file instead of overwriting it (JSON format only)"
+    )
+    parser.add_argument(
         "--list-defects",
         action="store_true",
         help="List all available defect types"
@@ -274,6 +279,13 @@ def main():
                 filename = f"batch_{args.count}_notices.{args.format}"
                 output_path = base_dir / filename
             
+            # Load existing data if appending to an existing JSON file
+            existing_data = None
+            if args.append and output_path.exists() and args.format == "json":
+                with open(output_path, encoding="utf-8") as f:
+                    existing_data = json.load(f)
+                print(f"Appending to existing file with {existing_data.get('count', 0)} notices...")
+
             # Use incremental saving for batch generation
             print(f"Generating {args.count} notices (saving incrementally to {output_path})...")
             
@@ -292,8 +304,24 @@ def main():
                 )
             
             print(f"\nGenerated {args.count} notices ({saver.valid_count} valid, {saver.invalid_count} invalid)")
+
+            # Merge with existing file if appending
+            if existing_data is not None:
+                with open(output_path, encoding="utf-8") as f:
+                    new_data = json.load(f)
+                merged_notices = existing_data["notices"] + new_data["notices"]
+                merged = {
+                    "count": len(merged_notices),
+                    "valid_count": existing_data.get("valid_count", 0) + new_data["valid_count"],
+                    "invalid_count": existing_data.get("invalid_count", 0) + new_data["invalid_count"],
+                    "notices": merged_notices,
+                }
+                with open(output_path, "w", encoding="utf-8") as f:
+                    json.dump(merged, f, indent=2)
+                print(f"Total notices in file: {merged['count']} ({merged['valid_count']} valid, {merged['invalid_count']} invalid)")
+
             print(f"Saved to {output_path}")
-            
+
             # Print defect distribution
             if saver.defect_counts:
                 print("\nDefect distribution:")
