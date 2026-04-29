@@ -10,7 +10,7 @@ from typing import List, Optional, Set
 from copy import deepcopy
 
 from .models import NoticeData, GeneratedNotice, DefectType
-from .templates.base import (
+from templates.rule_based_template.rule_based_template import (
     DISJUNCTIVE_DEMAND,
     NON_DISJUNCTIVE_DEMAND,
     AMOUNT_STATED_LANGUAGE,

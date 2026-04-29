@@ -57,7 +57,7 @@ class LLMNoticeGenerator:
             random.seed(seed)
         
         # Build list of available template files; selection happens per notice
-        templates_dir = Path(__file__).parent / "templates" / "templates_text" / "templates_without_blanks"
+        templates_dir = Path(__file__).parent.parent / "templates" / "templates_text" / "templates_without_blanks"
         self._template_files = list(templates_dir.glob("*.txt"))
         self._default_template = self._get_default_template()
 
