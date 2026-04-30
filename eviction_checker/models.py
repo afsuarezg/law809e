@@ -74,7 +74,7 @@ class ExtractedNotice(BaseModel):
     payment_terms: Optional[PaymentTerms] = None
 
     # Flags
-    is_signed: bool = False
+    is_signed: Optional[bool] = False
     has_forfeiture_declaration: Optional[bool] = None
 
 

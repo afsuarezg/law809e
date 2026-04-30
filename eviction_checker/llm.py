@@ -40,6 +40,8 @@ class LLMClient:
         self.google_client = None
         self.google_model = None
         self.preferred_provider = preferred_provider.lower() if preferred_provider else None
+        self.total_input_tokens: int = 0
+        self.total_output_tokens: int = 0
 
         # Initialize all available providers
         providers_initialized = []
@@ -165,6 +167,9 @@ class LLMClient:
             temperature=self.temperature,
             max_tokens=self.max_tokens
         )
+        if response.usage:
+            self.total_input_tokens += response.usage.prompt_tokens or 0
+            self.total_output_tokens += response.usage.completion_tokens or 0
         return response.choices[0].message.content
 
     def _complete_openai(self, prompt: str, system_message: Optional[str]) -> str:
@@ -181,6 +186,9 @@ class LLMClient:
             temperature=self.temperature,
             max_tokens=self.max_tokens
         )
+        if response.usage:
+            self.total_input_tokens += response.usage.prompt_tokens or 0
+            self.total_output_tokens += response.usage.completion_tokens or 0
         return response.choices[0].message.content
 
     def _list_anthropic_models(self) -> list:
@@ -193,6 +201,22 @@ class LLMClient:
             logger.warning(f"Could not list Anthropic models: {e}")
             return []
 
+    # Models that do not accept the temperature parameter
+    _NO_TEMPERATURE_MODELS = {"claude-opus-4-7", "claude-opus-4-5"}
+
+    def _anthropic_kwargs(self, model: str, prompt: str, system_message: Optional[str]) -> dict:
+        """Build kwargs for anthropic.messages.create, omitting temperature for models that reject it."""
+        kwargs: dict = {
+            "model": model,
+            "max_tokens": self.max_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if model not in self._NO_TEMPERATURE_MODELS:
+            kwargs["temperature"] = self.temperature
+        if system_message:
+            kwargs["system"] = system_message
+        return kwargs
+
     def _complete_anthropic(self, prompt: str, system_message: Optional[str]) -> str:
         """Get completion from Anthropic."""
         # Try common model names in order of preference (active as of 2026; see docs.anthropic.com model deprecations)
@@ -202,7 +226,7 @@ class LLMClient:
             "claude-opus-4-6",
             "claude-haiku-4-5-20251001",
         ]
-        
+
         model = os.getenv("ANTHROPIC_MODEL")
         if not model:
             # Try defaults until one works
@@ -210,51 +234,32 @@ class LLMClient:
             for default_model in default_models:
                 try:
                     model = default_model
-                    kwargs = {
-                        "model": model,
-                        "max_tokens": self.max_tokens,
-                        "temperature": self.temperature,
-                        "messages": [{"role": "user", "content": prompt}]
-                    }
-                    if system_message:
-                        kwargs["system"] = system_message
-                    
-                    response = self.anthropic_client.messages.create(**kwargs)
+                    response = self.anthropic_client.messages.create(
+                        **self._anthropic_kwargs(model, prompt, system_message)
+                    )
                     logger.info(f"Successfully using Anthropic model: {model}")
+                    self.total_input_tokens += response.usage.input_tokens or 0
+                    self.total_output_tokens += response.usage.output_tokens or 0
                     return response.content[0].text
                 except Exception as e:
                     last_error = e
                     error_msg = str(e)
                     if "404" not in error_msg and "not_found" not in error_msg.lower():
-                        # Not a model not found error, re-raise
                         raise
-                    # Try next model
                     continue
-            
-            # All models failed, show available models
+
             available_models = self._list_anthropic_models()
             logger.error(f"None of the default Anthropic models worked. Last error: {last_error}")
             if available_models:
                 logger.error(f"Available models: {', '.join(available_models[:5])}")
-            else:
-                logger.error("Could not retrieve available models. Check your API key and try:")
-                logger.error("  - claude-sonnet-4-6")
-                logger.error("  - claude-opus-4-6")
-                logger.error("  - claude-haiku-4-5-20251001")
             raise last_error or ValueError("No Anthropic model available")
-        
-        # Use specified model
-        kwargs = {
-            "model": model,
-            "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
-            "messages": [{"role": "user", "content": prompt}]
-        }
-        if system_message:
-            kwargs["system"] = system_message
 
         try:
-            response = self.anthropic_client.messages.create(**kwargs)
+            response = self.anthropic_client.messages.create(
+                **self._anthropic_kwargs(model, prompt, system_message)
+            )
+            self.total_input_tokens += response.usage.input_tokens or 0
+            self.total_output_tokens += response.usage.output_tokens or 0
             return response.content[0].text
         except Exception as e:
             error_msg = str(e)
@@ -263,11 +268,6 @@ class LLMClient:
                 logger.error(f"Anthropic model '{model}' not found.")
                 if available_models:
                     logger.error(f"Available models: {', '.join(available_models[:5])}")
-                else:
-                    logger.error("Try setting ANTHROPIC_MODEL to one of:")
-                    logger.error("  - claude-sonnet-4-6")
-                    logger.error("  - claude-opus-4-6")
-                    logger.error("  - claude-haiku-4-5-20251001")
             raise
 
     def _complete_google(self, prompt: str, system_message: Optional[str]) -> str:
@@ -305,6 +305,9 @@ class LLMClient:
                 )
                 logger.info(f"Successfully using Google model: {model}")
                 self.google_model = model  # cache for next call
+                if hasattr(response, "usage_metadata") and response.usage_metadata:
+                    self.total_input_tokens += response.usage_metadata.prompt_token_count or 0
+                    self.total_output_tokens += response.usage_metadata.candidates_token_count or 0
                 return response.text
             except Exception as e:
                 last_error = e

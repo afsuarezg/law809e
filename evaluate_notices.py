@@ -89,38 +89,45 @@ class _DefectMetrics:
 
 
 # ---------------------------------------------------------------------------
+# Pricing table — cost per million tokens (as of 2026-04)
+# ---------------------------------------------------------------------------
+_PRICING: Dict[str, Dict[str, float]] = {
+    "claude-sonnet-4-6":          {"input": 3.00,  "output": 15.00},
+    "claude-opus-4-7":            {"input": 15.00, "output": 75.00},
+    "claude-haiku-4-5-20251001":  {"input": 0.80,  "output": 4.00},
+    "gpt-4o":                     {"input": 2.50,  "output": 10.00},
+    "gpt-4o-mini":                {"input": 0.15,  "output": 0.60},
+    "gpt-4-turbo-preview":        {"input": 10.00, "output": 30.00},
+    "gpt-4-turbo":                {"input": 10.00, "output": 30.00},
+    "gemini-2.5-flash":           {"input": 0.15,  "output": 0.60},
+    "gemini-2.5-pro":             {"input": 1.25,  "output": 10.00},
+    "gemini-2.0-flash-lite":      {"input": 0.075, "output": 0.30},
+}
+
+
+def _estimate_cost(model: Optional[str], input_tokens: int, output_tokens: int) -> Optional[float]:
+    if not model:
+        return None
+    pricing = _PRICING.get(model)
+    if pricing is None:
+        return None
+    return round(
+        input_tokens / 1_000_000 * pricing["input"] +
+        output_tokens / 1_000_000 * pricing["output"],
+        6,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Extraction helpers
 # ---------------------------------------------------------------------------
-def _extract_llm(text: str, provider: str, model: Optional[str] = None):
-    """Extract fields via LLM (imports eviction_checker lazily)."""
-    import os
+def _create_extractor(mode: str, provider: str):
+    """Create an extractor instance. Caller manages model env-var overrides."""
+    if mode == "regex":
+        from eviction_checker.regex_extractor import RegexExtractor
+        return RegexExtractor()
     from eviction_checker.extractor import EntityExtractor
-    env_key = {
-        "anthropic": "ANTHROPIC_MODEL",
-        "openai": "OPENAI_MODEL",
-        "ollama": "OLLAMA_MODEL",
-        "google": "GOOGLE_MODEL",
-    }.get(provider)
-    original = None
-    if model and env_key:
-        original = os.environ.get(env_key)
-        os.environ[env_key] = model
-    try:
-        extractor = EntityExtractor(provider=provider)
-        return extractor.extract(text)
-    finally:
-        if model and env_key:
-            if original is None:
-                os.environ.pop(env_key, None)
-            else:
-                os.environ[env_key] = original
-
-
-def _extract_regex(text: str):
-    """Extract fields via regex (no API calls)."""
-    from eviction_checker.regex_extractor import RegexExtractor
-    extractor = RegexExtractor()
-    return extractor.extract(text)
+    return EntityExtractor(provider=provider)
 
 
 def _validate(extracted_notice):
@@ -203,99 +210,133 @@ def evaluate(
 
     notices_raw: List[Dict[str, Any]] = batch if isinstance(batch, list) else batch["notices"]
 
-    metrics: Dict[str, _DefectMetrics] = {mid: _DefectMetrics() for mid in ALL_DEFECT_IDS}
-    exact_matches = 0
-    errors = 0
-    notice_results: List[Dict[str, Any]] = []
-
-    for idx, item in enumerate(notices_raw):
-        text: str = item.get("text", "")
-        raw_defects: List[str] = item.get("defects", [])
-        expected_ids: Set[str] = {
-            DEFECT_MAPPING[d] for d in raw_defects if d in DEFECT_MAPPING
-        }
-
-        # Log unknown defect names so the caller can update the mapping
-        unknown = [d for d in raw_defects if d not in DEFECT_MAPPING]
-        if unknown:
-            logging.warning(f"Notice #{idx + 1}: unknown defect name(s) {unknown} — skipped in mapping")
-
-        extracted_dict: Optional[Dict[str, Any]] = None
-        detected_ids: Set[str] = set()
-        error_msg: Optional[str] = None
-
-        try:
-            if mode == "llm":
-                extracted = _extract_llm(text, provider, model)
-            else:
-                extracted = _extract_regex(text)
-
-            if debug:
-                extracted_dict = _extracted_to_dict(extracted)
-
-            detected_ids = _validate(extracted)
-
-        except Exception as exc:
-            error_msg = str(exc)
-            errors += 1
-            logging.error(f"Notice #{idx + 1} failed: {exc}")
-
-        # Compute TP/FP/FN
-        tp_ids = detected_ids & expected_ids
-        fp_ids = detected_ids - expected_ids
-        fn_ids = expected_ids - detected_ids
-
-        for mid in ALL_DEFECT_IDS:
-            if mid in tp_ids:
-                metrics[mid].tp += 1
-            elif mid in fp_ids:
-                metrics[mid].fp += 1
-            elif mid in fn_ids:
-                metrics[mid].fn += 1
-
-        if detected_ids == expected_ids:
-            exact_matches += 1
-
-        result: Dict[str, Any] = {
-            "index": idx + 1,
-            "detected": sorted(detected_ids),
-            "expected": sorted(expected_ids),
-            "tp": sorted(tp_ids),
-            "fp": sorted(fp_ids),
-            "fn": sorted(fn_ids),
-            "exact_match": detected_ids == expected_ids,
-        }
-        if error_msg:
-            result["error"] = error_msg
-        if debug and extracted_dict is not None:
-            result["extracted"] = extracted_dict
-
-        notice_results.append(result)
-        logging.info(
-            f"Notice #{idx + 1}: expected={sorted(expected_ids)} "
-            f"detected={sorted(detected_ids)} "
-            f"exact={'✓' if detected_ids == expected_ids else '✗'}"
-        )
-
-    total = len(notices_raw)
-    report: Dict[str, Any] = {
-        "config": {
-            "mode": mode,
-            "provider": provider if mode == "llm" else None,
-            "model": resolved_model,
-            "file": batch_path.name,
-            "evaluated_at": datetime.now().isoformat(timespec="seconds"),
-        },
-        "summary": {
-            "total": total,
-            "exact_match": exact_matches,
-            "exact_match_pct": round(exact_matches / total * 100, 1) if total else 0.0,
-            "errors": errors,
-        },
-        "per_defect": {mid: metrics[mid].to_dict() for mid in ALL_DEFECT_IDS},
-        "notices": notice_results,
+    # Set model env var for the entire run so LLMClient picks it up at call time
+    _ENV_KEYS = {
+        "anthropic": "ANTHROPIC_MODEL",
+        "openai":    "OPENAI_MODEL",
+        "ollama":    "OLLAMA_MODEL",
+        "google":    "GOOGLE_MODEL",
     }
-    return report
+    env_key = _ENV_KEYS.get(provider)
+    _original_env: Optional[str] = None
+    if model and env_key:
+        _original_env = os.environ.get(env_key)
+        os.environ[env_key] = model
+
+    try:
+        # Create one extractor shared across all notices so token counts accumulate
+        extractor = _create_extractor(mode, provider)
+
+        metrics: Dict[str, _DefectMetrics] = {mid: _DefectMetrics() for mid in ALL_DEFECT_IDS}
+        exact_matches = 0
+        errors = 0
+        notice_results: List[Dict[str, Any]] = []
+
+        for idx, item in enumerate(notices_raw):
+            text: str = item.get("text", "")
+            raw_defects: List[str] = item.get("defects", [])
+            expected_ids: Set[str] = {
+                DEFECT_MAPPING[d] for d in raw_defects if d in DEFECT_MAPPING
+            }
+
+            unknown = [d for d in raw_defects if d not in DEFECT_MAPPING]
+            if unknown:
+                logging.warning(f"Notice #{idx + 1}: unknown defect name(s) {unknown} — skipped in mapping")
+
+            extracted_dict: Optional[Dict[str, Any]] = None
+            detected_ids: Set[str] = set()
+            error_msg: Optional[str] = None
+
+            try:
+                extracted = extractor.extract(text)
+                if debug:
+                    extracted_dict = _extracted_to_dict(extracted)
+                detected_ids = _validate(extracted)
+            except Exception as exc:
+                error_msg = str(exc)
+                errors += 1
+                logging.error(f"Notice #{idx + 1} failed: {exc}")
+
+            tp_ids = detected_ids & expected_ids
+            fp_ids = detected_ids - expected_ids
+            fn_ids = expected_ids - detected_ids
+
+            for mid in ALL_DEFECT_IDS:
+                if mid in tp_ids:
+                    metrics[mid].tp += 1
+                elif mid in fp_ids:
+                    metrics[mid].fp += 1
+                elif mid in fn_ids:
+                    metrics[mid].fn += 1
+
+            if detected_ids == expected_ids:
+                exact_matches += 1
+
+            result: Dict[str, Any] = {
+                "index": idx + 1,
+                "detected": sorted(detected_ids),
+                "expected": sorted(expected_ids),
+                "tp": sorted(tp_ids),
+                "fp": sorted(fp_ids),
+                "fn": sorted(fn_ids),
+                "exact_match": detected_ids == expected_ids,
+            }
+            if error_msg:
+                result["error"] = error_msg
+            if debug and extracted_dict is not None:
+                result["extracted"] = extracted_dict
+
+            notice_results.append(result)
+            logging.info(
+                f"Notice #{idx + 1}: expected={sorted(expected_ids)} "
+                f"detected={sorted(detected_ids)} "
+                f"exact={'✓' if detected_ids == expected_ids else '✗'}"
+            )
+
+        total = len(notices_raw)
+
+        # Collect token usage from the shared LLM client
+        usage: Dict[str, Any] = {}
+        if mode == "llm" and hasattr(extractor, "llm_client"):
+            llm = extractor.llm_client
+            in_tok = getattr(llm, "total_input_tokens", 0)
+            out_tok = getattr(llm, "total_output_tokens", 0)
+            usage = {
+                "input_tokens": in_tok,
+                "output_tokens": out_tok,
+                "total_tokens": in_tok + out_tok,
+                "estimated_cost_usd": _estimate_cost(resolved_model, in_tok, out_tok),
+                "pricing_note": "Approximate cost based on public pricing as of 2026-04. "
+                                "null if model not in pricing table.",
+            }
+
+        report: Dict[str, Any] = {
+            "config": {
+                "mode": mode,
+                "provider": provider if mode == "llm" else None,
+                "model": resolved_model,
+                "file": batch_path.name,
+                "evaluated_at": datetime.now().isoformat(timespec="seconds"),
+            },
+            "usage": usage,
+            "summary": {
+                "total": total,
+                "exact_match": exact_matches,
+                "exact_match_pct": round(exact_matches / total * 100, 1) if total else 0.0,
+                "errors": errors,
+            },
+            "per_defect": {mid: metrics[mid].to_dict() for mid in ALL_DEFECT_IDS},
+            "notices": notice_results,
+        }
+        return report
+
+    finally:
+        # Restore original env var regardless of success or failure
+        if model and env_key:
+            if _original_env is None:
+                os.environ.pop(env_key, None)
+            else:
+                os.environ[env_key] = _original_env
 
 
 # ---------------------------------------------------------------------------
@@ -401,9 +442,12 @@ def main() -> None:
     for run in runs:
         model_label = run["config"].get("model") or "default"
         s = run["summary"]
+        u = run.get("usage", {})
+        cost_str = f"  est. cost=${u['estimated_cost_usd']:.4f}" if u.get("estimated_cost_usd") is not None else ""
+        tok_str = f"  tokens={u.get('total_tokens', 0):,}" if u else ""
         print(
             f"\n[{model_label}]  {s['exact_match']}/{s['total']} exact matches "
-            f"({s['exact_match_pct']}%)  errors={s['errors']}",
+            f"({s['exact_match_pct']}%)  errors={s['errors']}{tok_str}{cost_str}",
             file=sys.stderr,
         )
         per = run["per_defect"]
