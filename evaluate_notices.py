@@ -118,6 +118,21 @@ def _estimate_cost(model: Optional[str], input_tokens: int, output_tokens: int) 
     )
 
 
+def _next_numeric_output_path(base_dir: Path, stem: str) -> Path:
+    """Return base_dir / "<stem>_<N>.json" with N = lowest unused non-negative int."""
+    base_dir.mkdir(parents=True, exist_ok=True)
+    used: set = set()
+    prefix = f"{stem}_"
+    for p in base_dir.glob(f"{prefix}*.json"):
+        suffix = p.stem[len(prefix):]
+        if suffix.isdigit():
+            used.add(int(suffix))
+    n = 0
+    while n in used:
+        n += 1
+    return base_dir / f"{stem}_{n}.json"
+
+
 # ---------------------------------------------------------------------------
 # Extraction helpers
 # ---------------------------------------------------------------------------
@@ -363,7 +378,7 @@ def main() -> None:
         "--output",
         type=Path,
         default=None,
-        help="Path to write JSON report (default: stdout)",
+        help="Path to write JSON report (default: evaluation/<batch-stem>_<N>.json with auto-incremented N starting at 0)",
     )
     parser.add_argument(
         "--model",
@@ -432,10 +447,13 @@ def main() -> None:
     output_json = json.dumps(report, indent=2, cls=_Encoder)
 
     if args.output:
-        args.output.write_text(output_json, encoding="utf-8")
-        print(f"Report written to {args.output}", file=sys.stderr)
+        output_path = args.output
     else:
-        print(output_json)
+        output_path = _next_numeric_output_path(Path("evaluation"), args.batch.stem)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(output_json, encoding="utf-8")
+    print(f"Report written to {output_path}", file=sys.stderr)
 
     # Print a compact per-model summary table to stderr
     fmt = lambda v: f"{v:.2f}" if v is not None else "  N/A"
