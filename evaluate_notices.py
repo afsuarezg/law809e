@@ -91,11 +91,29 @@ class _DefectMetrics:
 # ---------------------------------------------------------------------------
 # Extraction helpers
 # ---------------------------------------------------------------------------
-def _extract_llm(text: str, provider: str):
+def _extract_llm(text: str, provider: str, model: Optional[str] = None):
     """Extract fields via LLM (imports eviction_checker lazily)."""
+    import os
     from eviction_checker.extractor import EntityExtractor
-    extractor = EntityExtractor(provider=provider)
-    return extractor.extract(text)
+    env_key = {
+        "anthropic": "ANTHROPIC_MODEL",
+        "openai": "OPENAI_MODEL",
+        "ollama": "OLLAMA_MODEL",
+        "google": "GOOGLE_MODEL",
+    }.get(provider)
+    original = None
+    if model and env_key:
+        original = os.environ.get(env_key)
+        os.environ[env_key] = model
+    try:
+        extractor = EntityExtractor(provider=provider)
+        return extractor.extract(text)
+    finally:
+        if model and env_key:
+            if original is None:
+                os.environ.pop(env_key, None)
+            else:
+                os.environ[env_key] = original
 
 
 def _extract_regex(text: str):
@@ -121,6 +139,36 @@ def _extracted_to_dict(notice) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Multi-model comparison builder
+# ---------------------------------------------------------------------------
+def _build_comparison(runs: List[Dict[str, Any]], batch_path: Path) -> Dict[str, Any]:
+    """Combine multiple single-model runs into one comparison report."""
+    labels = [
+        r["config"].get("model") or r["config"].get("provider") or f"run_{i + 1}"
+        for i, r in enumerate(runs)
+    ]
+
+    comparison: Dict[str, Any] = {
+        "exact_match_pct": {label: runs[i]["summary"]["exact_match_pct"] for i, label in enumerate(labels)},
+        "per_defect": {
+            mid: {
+                metric: {label: runs[i]["per_defect"][mid][metric] for i, label in enumerate(labels)}
+                for metric in ("precision", "recall", "f1", "tp", "fp", "fn")
+            }
+            for mid in ALL_DEFECT_IDS
+        },
+    }
+
+    return {
+        "file": batch_path.name,
+        "evaluated_at": datetime.now().isoformat(timespec="seconds"),
+        "models": labels,
+        "runs": runs,
+        "comparison": comparison,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Main evaluation loop
 # ---------------------------------------------------------------------------
 def evaluate(
@@ -128,7 +176,28 @@ def evaluate(
     mode: str,
     provider: str,
     debug: bool,
+    model: Optional[str] = None,
 ) -> Dict[str, Any]:
+    import os
+    # Resolve the model name that will actually be used
+    if mode == "llm":
+        env_key = {
+            "anthropic": "ANTHROPIC_MODEL",
+            "openai": "OPENAI_MODEL",
+            "ollama": "OLLAMA_MODEL",
+            "google": "GOOGLE_MODEL",
+        }.get(provider)
+        resolved_model = model or (os.environ.get(env_key) if env_key else None)
+        if resolved_model is None:
+            defaults = {
+                "anthropic": "claude-sonnet-4-6",
+                "openai": "gpt-4-turbo-preview",
+                "google": "gemini-2.5-flash",
+            }
+            resolved_model = defaults.get(provider)
+    else:
+        resolved_model = None
+
     with open(batch_path, encoding="utf-8") as fh:
         batch = json.load(fh)
 
@@ -157,7 +226,7 @@ def evaluate(
 
         try:
             if mode == "llm":
-                extracted = _extract_llm(text, provider)
+                extracted = _extract_llm(text, provider, model)
             else:
                 extracted = _extract_regex(text)
 
@@ -213,6 +282,7 @@ def evaluate(
         "config": {
             "mode": mode,
             "provider": provider if mode == "llm" else None,
+            "model": resolved_model,
             "file": batch_path.name,
             "evaluated_at": datetime.now().isoformat(timespec="seconds"),
         },
@@ -255,6 +325,18 @@ def main() -> None:
         help="Path to write JSON report (default: stdout)",
     )
     parser.add_argument(
+        "--model",
+        type=str,
+        action="append",
+        default=None,
+        dest="models",
+        metavar="MODEL",
+        help="LLM model name, optionally prefixed with provider: "
+             "'provider/model-name' (e.g. anthropic/claude-sonnet-4-6, openai/gpt-4o, google/gemini-2.5-flash). "
+             "Repeatable for multi-model/multi-provider comparison. "
+             "Without prefix, uses --provider. Defaults to provider built-in default.",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         help="Include extracted fields for each notice in the report",
@@ -275,13 +357,36 @@ def main() -> None:
         print(f"Error: file not found: {args.batch}", file=sys.stderr)
         sys.exit(1)
 
-    print(
-        f"Evaluating {args.batch.name}  mode={args.mode}"
-        + (f"  provider={args.provider}" if args.mode == "llm" else ""),
-        file=sys.stderr,
-    )
+    # Parse model specs: "provider/model-name" or plain "model-name" or None (default)
+    raw_models = args.models or [None]
+    VALID_PROVIDERS = {"anthropic", "openai", "ollama", "google"}
+    run_specs: List[tuple] = []  # (provider, model_or_None)
+    for m in raw_models:
+        if m and "/" in m:
+            prov, mod = m.split("/", 1)
+            if prov not in VALID_PROVIDERS:
+                print(f"Error: unknown provider '{prov}' in --model {m!r}", file=sys.stderr)
+                sys.exit(1)
+            run_specs.append((prov, mod))
+        else:
+            run_specs.append((args.provider, m))
 
-    report = evaluate(args.batch, args.mode, args.provider, args.debug)
+    runs: List[Dict[str, Any]] = []
+    for provider, model in run_specs:
+        label = f"{provider}/{model}" if model else provider
+        print(
+            f"Evaluating {args.batch.name}  mode={args.mode}"
+            + (f"  provider={provider}  model={model or 'default'}" if args.mode == "llm" else ""),
+            file=sys.stderr,
+        )
+        run = evaluate(args.batch, args.mode, provider, args.debug, model)
+        runs.append(run)
+
+    # Single model → existing flat format; multiple → comparison format
+    if len(runs) == 1:
+        report = runs[0]
+    else:
+        report = _build_comparison(runs, args.batch)
 
     output_json = json.dumps(report, indent=2, cls=_Encoder)
 
@@ -291,26 +396,28 @@ def main() -> None:
     else:
         print(output_json)
 
-    # Print a compact summary to stderr regardless
-    s = report["summary"]
-    print(
-        f"\nSummary: {s['exact_match']}/{s['total']} exact matches "
-        f"({s['exact_match_pct']}%)  errors={s['errors']}",
-        file=sys.stderr,
-    )
-    per = report["per_defect"]
-    print(
-        f"{'Defect':<10} {'P':>6} {'R':>6} {'F1':>6} {'TP':>4} {'FP':>4} {'FN':>4}",
-        file=sys.stderr,
-    )
-    for mid in ALL_DEFECT_IDS:
-        d = per[mid]
-        fmt = lambda v: f"{v:.2f}" if v is not None else "  N/A"
+    # Print a compact per-model summary table to stderr
+    fmt = lambda v: f"{v:.2f}" if v is not None else "  N/A"
+    for run in runs:
+        model_label = run["config"].get("model") or "default"
+        s = run["summary"]
         print(
-            f"{mid:<10} {fmt(d['precision']):>6} {fmt(d['recall']):>6} "
-            f"{fmt(d['f1']):>6} {d['tp']:>4} {d['fp']:>4} {d['fn']:>4}",
+            f"\n[{model_label}]  {s['exact_match']}/{s['total']} exact matches "
+            f"({s['exact_match_pct']}%)  errors={s['errors']}",
             file=sys.stderr,
         )
+        per = run["per_defect"]
+        print(
+            f"{'Defect':<10} {'P':>6} {'R':>6} {'F1':>6} {'TP':>4} {'FP':>4} {'FN':>4}",
+            file=sys.stderr,
+        )
+        for mid in ALL_DEFECT_IDS:
+            d = per[mid]
+            print(
+                f"{mid:<10} {fmt(d['precision']):>6} {fmt(d['recall']):>6} "
+                f"{fmt(d['f1']):>6} {d['tp']:>4} {d['fp']:>4} {d['fn']:>4}",
+                file=sys.stderr,
+            )
 
 
 if __name__ == "__main__":
