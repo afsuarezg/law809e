@@ -49,6 +49,9 @@ Thumbs.db
 output/
 *.log
 
+# Auth (real config has password hashes and cookie secret — keep out of git)
+auth_config.yaml
+
 #executables
 *.exe
 *.app

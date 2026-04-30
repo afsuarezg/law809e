@@ -17,10 +17,13 @@ from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
+import streamlit_authenticator as stauth
+import yaml
 
 
 BATCH_DIR = Path("synthetic_notices/output/LLM_generated")
 FEEDBACK_DIR = BATCH_DIR / "feedback"
+AUTH_CONFIG_PATH = Path("auth_config.yaml")
 
 DEFECT_DESCRIPTIONS = {
     "MVP-001": "Missing disjunctive phrasing ('pay OR quit')",
@@ -53,8 +56,25 @@ def _slugify(s: str) -> str:
     return s.strip("_")
 
 
-def _get_current_user() -> str:
-    return st.session_state.get("current_user", "").strip()
+def load_authenticator():
+    """Load auth_config.yaml and build the Authenticator. Not cached: the
+    Authenticator instantiates a CookieManager widget internally, which
+    Streamlit forbids inside cached functions."""
+    if not AUTH_CONFIG_PATH.exists():
+        st.error(
+            f"Missing `{AUTH_CONFIG_PATH}`. Initialize it with:\n\n"
+            "```\npython manage_auth_users.py init\n"
+            "python manage_auth_users.py add --username <user> --name \"<Name>\" --email <email>\n```"
+        )
+        st.stop()
+    with open(AUTH_CONFIG_PATH, encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    return stauth.Authenticate(
+        config["credentials"],
+        config["cookie"]["name"],
+        config["cookie"]["key"],
+        config["cookie"]["expiry_days"],
+    )
 
 
 def feedback_path_for(batch_path, user_slug):
@@ -110,21 +130,32 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---- Sidebar: reviewer identity (gates the rest of the UI) ----
+# ---- Login (gates the rest of the UI) ----
+authenticator = load_authenticator()
+
+try:
+    authenticator.login(location="main")
+except Exception as exc:
+    st.error(f"Login error: {exc}")
+    st.stop()
+
+auth_status = st.session_state.get("authentication_status")
+if auth_status is False:
+    st.error("Username or password is incorrect.")
+    st.stop()
+if auth_status is None:
+    st.info("Please log in to start reviewing.")
+    st.stop()
+
+# Authenticated from here on.
+username = st.session_state["username"]
+display_name = st.session_state.get("name") or username
+user_slug = _slugify(username)
+
 with st.sidebar:
     st.header("Reviewer")
-    st.text_input(
-        "Your name or email",
-        key="current_user",
-        placeholder="e.g. asuarezg@stanford.edu",
-        help="Used to attribute your feedback. Each reviewer's feedback is stored in a separate file.",
-    )
-
-user = _get_current_user()
-if not user:
-    st.warning("👈 Please enter your name or email in the sidebar to start reviewing.")
-    st.stop()
-user_slug = _slugify(user)
+    st.markdown(f"**{display_name}**  \n`{username}`")
+    authenticator.logout(location="sidebar")
 
 batches = list_batch_files()
 if not batches:
@@ -250,7 +281,8 @@ review["comment"] = st.text_area(
 # ---- Auto-save (only if anything changed) ----
 if review != original_review:
     review["reviewed_at"] = datetime.now().isoformat(timespec="seconds")
-    review["reviewer"] = user
+    review["reviewer"] = username
+    review["reviewer_name"] = display_name
     feedback["reviews"][review_key] = review
     save_feedback(batch_path, user_slug, feedback)
     st.success(f"💾 Saved to `{feedback_path_for(batch_path, user_slug).name}`")
