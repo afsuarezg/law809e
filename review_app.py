@@ -16,6 +16,7 @@ Feedback auto-saves to `evaluation/feedback/<eval-stem>_feedback.json`.
 
 import copy
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -83,29 +84,92 @@ def get_notice_text(notice_result, batch_lookup):
     return batch_lookup.get(notice_result["index"], "")
 
 
-def feedback_path_for(report_path):
+def _slugify(s: str) -> str:
+    """Make a string safe for use in a filename: lowercase, alnum + underscores."""
+    s = s.strip().lower()
+    s = re.sub(r"[^a-z0-9]+", "_", s)
+    return s.strip("_")
+
+
+def _get_current_user() -> str:
+    """Return the active reviewer's identifier. Empty string if not set.
+
+    Future: when deployed behind Azure Easy Auth, read
+    st.context.headers["X-MS-CLIENT-PRINCIPAL-NAME"] first and only fall back
+    to the sidebar input. For now, session-state only.
+    """
+    return st.session_state.get("current_user", "").strip()
+
+
+def feedback_path_for(report_path, user_slug):
     FEEDBACK_DIR.mkdir(parents=True, exist_ok=True)
-    return FEEDBACK_DIR / f"{report_path.stem}_feedback.json"
+    return FEEDBACK_DIR / f"{report_path.stem}__{user_slug}__feedback.json"
 
 
-def load_feedback(report_path):
-    path = feedback_path_for(report_path)
+def load_feedback(report_path, user_slug):
+    path = feedback_path_for(report_path, user_slug)
     if path.exists():
         with open(path, encoding="utf-8") as f:
             return json.load(f)
-    return {"eval_report": report_path.name, "reviews": {}}
+    return {"eval_report": report_path.name, "reviewer": user_slug, "reviews": {}}
 
 
-def save_feedback(report_path, data):
-    path = feedback_path_for(report_path)
+def save_feedback(report_path, user_slug, data):
+    path = feedback_path_for(report_path, user_slug)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
+
+
+def count_reviewers_for(report_path, notice_index, model_label):
+    """How many distinct reviewers have left feedback for this notice/model?"""
+    pattern = f"{report_path.stem}__*__feedback.json"
+    review_key = f"{notice_index}::{model_label}"
+    count = 0
+    for p in FEEDBACK_DIR.glob(pattern):
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+            if review_key in data.get("reviews", {}):
+                count += 1
+        except Exception:
+            continue
+    return count
 
 
 # ============================ App ============================
 
 st.set_page_config(page_title="Notice Review", layout="wide")
 st.title("Synthetic Notice Review")
+
+# Make the disabled notice-text textarea readable (override Streamlit's faded grey)
+st.markdown(
+    """
+    <style>
+    .stTextArea textarea[disabled] {
+        color: #1a1a1a !important;
+        -webkit-text-fill-color: #1a1a1a !important;
+        opacity: 1 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ---- Sidebar: reviewer identity (gates the rest of the UI) ----
+with st.sidebar:
+    st.header("Reviewer")
+    st.text_input(
+        "Your name or email",
+        key="current_user",
+        placeholder="e.g. asuarezg@stanford.edu",
+        help="Used to attribute your feedback. Each reviewer's feedback is stored in a separate file.",
+    )
+
+user = _get_current_user()
+if not user:
+    st.warning("👈 Please enter your name or email in the sidebar to start reviewing.")
+    st.stop()
+user_slug = _slugify(user)
 
 reports = list_eval_reports()
 if not reports:
@@ -163,13 +227,13 @@ with st.sidebar:
         st.session_state[idx_state_key] = new_idx - 1
         st.rerun()
 
-    # Show how many notices have been reviewed for this report+model
-    feedback_preview = load_feedback(report_choice)
+    # Show how many notices the CURRENT user has reviewed for this report+model
+    feedback_preview = load_feedback(report_choice, user_slug)
     reviewed_for_model = sum(
         1 for k in feedback_preview.get("reviews", {})
         if k.endswith(f"::{model_label}")
     )
-    st.markdown(f"**Reviewed:** {reviewed_for_model} / {total}")
+    st.markdown(f"**Your reviews:** {reviewed_for_model} / {total}")
 
 current_idx = st.session_state[idx_state_key]
 current = notices[current_idx]
@@ -182,8 +246,8 @@ batch_filename = (
 )
 batch_lookup = load_batch_text_lookup(batch_filename)
 
-# ---- Load existing feedback for this notice ----
-feedback = load_feedback(report_choice)
+# ---- Load existing feedback for this notice (this user's file only) ----
+feedback = load_feedback(report_choice, user_slug)
 review_key = f"{current['index']}::{model_label}"
 review = feedback["reviews"].get(review_key, {})
 review.setdefault("notice_index", current["index"])
@@ -191,6 +255,7 @@ review.setdefault("model", model_label)
 review.setdefault("comment", "")
 review.setdefault("expected_present", {})
 review.setdefault("detected_correct", {})
+review.setdefault("additional_defects_present", {})
 original_review = copy.deepcopy(review)
 
 # ---- Header ----
@@ -201,31 +266,52 @@ with header_l:
     st.markdown(f"**Status:** {status}")
 with header_r:
     if review.get("reviewed_at"):
-        st.caption(f"Last reviewed: {review['reviewed_at']}")
+        st.caption(f"You last reviewed: {review['reviewed_at']}")
     else:
-        st.caption("Not yet reviewed")
+        st.caption("You haven't reviewed this yet")
+    n_reviewers = count_reviewers_for(report_choice, current["index"], model_label)
+    if n_reviewers > 0:
+        st.caption(f"👥 Reviewed by {n_reviewers} reviewer(s) so far")
 
 if current.get("error"):
     st.error(f"Evaluation error: {current['error']}")
 
-# ---- Notice text ----
-text = get_notice_text(current, batch_lookup)
-with st.expander("📄 Notice text", expanded=True):
+# ---- Notice text (left) + defect review (right) ----
+def widget_key(kind, defect):
+    return f"{kind}::{report_choice.stem}::{model_label}::{current_idx}::{defect}"
+
+text_col, defects_col = st.columns([3, 2])
+
+with text_col:
+    st.subheader("📄 Notice text")
+    text = get_notice_text(current, batch_lookup)
     if text:
-        st.text(text)
+        st.text_area(
+            "Notice text",
+            value=text,
+            height=600,
+            disabled=True,
+            label_visibility="collapsed",
+            key=f"notice_text::{report_choice.stem}::{model_label}::{current_idx}",
+        )
     else:
         st.warning(
             "Notice text not available. Re-run evaluation with `--debug` to embed text in the report, "
             f"or place the source batch file at `{BATCH_DIR}/{batch_filename or '<batch>.json'}`."
         )
 
-# ---- Defect review (two columns) ----
-def widget_key(kind, defect):
-    return f"{kind}::{report_choice.stem}::{model_label}::{current_idx}::{defect}"
+with defects_col:
+    st.subheader("Other defects you observe")
+    st.caption("Check any defects you believe are present in the notice.")
+    for d, desc in DEFECT_DESCRIPTIONS.items():
+        review["additional_defects_present"][d] = st.checkbox(
+            f"**{d}** — {desc}",
+            value=review["additional_defects_present"].get(d, False),
+            key=widget_key("add", d),
+        )
 
-col_exp, col_det = st.columns(2)
+    st.divider()
 
-with col_exp:
     st.subheader("Expected (ground truth)")
     st.caption("Check if this defect IS actually present in the notice.")
     expected = current.get("expected", [])
@@ -239,7 +325,8 @@ with col_exp:
             key=widget_key("exp", d),
         )
 
-with col_det:
+    st.divider()
+
     st.subheader("Detected (by logic)")
     st.caption("Check if the logic CORRECTLY flagged this defect.")
     detected = current.get("detected", [])
@@ -275,6 +362,7 @@ review["comment"] = st.text_area(
 # ---- Auto-save (only if anything changed) ----
 if review != original_review:
     review["reviewed_at"] = datetime.now().isoformat(timespec="seconds")
+    review["reviewer"] = user
     feedback["reviews"][review_key] = review
-    save_feedback(report_choice, feedback)
-    st.success(f"💾 Saved to `{feedback_path_for(report_choice).name}`")
+    save_feedback(report_choice, user_slug, feedback)
+    st.success(f"💾 Saved to `{feedback_path_for(report_choice, user_slug).name}`")
