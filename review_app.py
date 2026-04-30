@@ -253,17 +253,17 @@ review = feedback["reviews"].get(review_key, {})
 review.setdefault("notice_index", current["index"])
 review.setdefault("model", model_label)
 review.setdefault("comment", "")
-review.setdefault("expected_present", {})
-review.setdefault("detected_correct", {})
 review.setdefault("additional_defects_present", {})
+review.setdefault("revealed", False)
 original_review = copy.deepcopy(review)
 
 # ---- Header ----
-status = "✅ Exact match" if current.get("exact_match") else "❌ Mismatch"
 header_l, header_r = st.columns([3, 1])
 with header_l:
     st.subheader(f"Notice {current['index']} of {total}")
-    st.markdown(f"**Status:** {status}")
+    if review.get("revealed"):
+        status = "✅ Exact match" if current.get("exact_match") else "❌ Mismatch"
+        st.markdown(f"**Status:** {status}")
 with header_r:
     if review.get("reviewed_at"):
         st.caption(f"You last reviewed: {review['reviewed_at']}")
@@ -312,41 +312,39 @@ with defects_col:
 
     st.divider()
 
-    st.subheader("Expected (ground truth)")
-    st.caption("Check if this defect IS actually present in the notice.")
-    expected = current.get("expected", [])
-    if not expected:
-        st.info("No defects expected (notice should be valid).")
-    for d in expected:
-        desc = DEFECT_DESCRIPTIONS.get(d, d)
-        review["expected_present"][d] = st.checkbox(
-            f"**{d}** — {desc}",
-            value=review["expected_present"].get(d, True),
-            key=widget_key("exp", d),
-        )
-
-    st.divider()
-
-    st.subheader("Detected (by logic)")
-    st.caption("Check if the logic CORRECTLY flagged this defect.")
-    detected = current.get("detected", [])
-    if not detected:
-        st.info("No defects detected by the logic.")
-    for d in detected:
-        desc = DEFECT_DESCRIPTIONS.get(d, d)
-        review["detected_correct"][d] = st.checkbox(
-            f"**{d}** — {desc}",
-            value=review["detected_correct"].get(d, True),
-            key=widget_key("det", d),
-        )
-
-# ---- TP/FP/FN summary ----
-with st.expander("Confusion matrix details"):
-    st.markdown(
-        f"- **TP** (in both): `{current.get('tp', [])}`\n"
-        f"- **FP** (detected, not expected): `{current.get('fp', [])}`\n"
-        f"- **FN** (expected, not detected): `{current.get('fn', [])}`"
+    review["revealed"] = st.checkbox(
+        "👁️ Reveal expected and detected defects",
+        value=review.get("revealed", False),
+        key=f"reveal::{report_choice.stem}::{model_label}::{current_idx}",
+        help="Show the synthetic generator's ground truth and the automated logic's output. "
+             "Check this only after you've recorded your own observations above.",
     )
+
+    if review["revealed"]:
+        st.subheader("Expected (ground truth)")
+        expected = current.get("expected", [])
+        if expected:
+            for d in expected:
+                desc = DEFECT_DESCRIPTIONS.get(d, d)
+                st.markdown(f"- **{d}** — {desc}")
+        else:
+            st.info("No defects expected (notice should be valid).")
+
+        st.subheader("Detected (by logic)")
+        detected = current.get("detected", [])
+        if detected:
+            for d in detected:
+                desc = DEFECT_DESCRIPTIONS.get(d, d)
+                st.markdown(f"- **{d}** — {desc}")
+        else:
+            st.info("No defects detected by the logic.")
+
+        with st.expander("Confusion matrix details"):
+            st.markdown(
+                f"- **TP** (in both): `{current.get('tp', [])}`\n"
+                f"- **FP** (detected, not expected): `{current.get('fp', [])}`\n"
+                f"- **FN** (expected, not detected): `{current.get('fn', [])}`"
+            )
 
 # ---- Comment ----
 st.subheader("📝 Comments")
