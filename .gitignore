@@ -49,7 +49,8 @@ Thumbs.db
 output/
 *.log
 
-# Auth (real config has password hashes and cookie secret — keep out of git)
+# Auth / secrets
+.streamlit/secrets.toml
 auth_config.yaml
 streamlit_secrets_preview.toml
 

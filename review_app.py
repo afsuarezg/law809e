@@ -20,13 +20,10 @@ from pathlib import Path
 
 import requests
 import streamlit as st
-import streamlit_authenticator as stauth
-import yaml
 
 
 BATCH_DIR = Path(os.environ.get("BATCH_DIR", "synthetic_notices/output/LLM_generated"))
 FEEDBACK_DIR = Path(os.environ.get("FEEDBACK_DIR", str(BATCH_DIR / "feedback")))
-AUTH_CONFIG_PATH = Path(os.environ.get("AUTH_CONFIG_PATH", "auth_config.yaml"))
 
 DEFECT_DESCRIPTIONS = {
     "MVP-001": "Missing disjunctive phrasing ('pay OR quit')",
@@ -59,42 +56,13 @@ def _slugify(s: str) -> str:
     return s.strip("_")
 
 
-def _load_auth_config() -> dict:
-    """Return the auth config dict.
-
-    Streamlit Cloud: from st.secrets['auth'] (TOML-based).
-    Local dev: from auth_config.yaml. The yaml.safe_load returns mutable dicts;
-    st.secrets entries are roundtripped via JSON to give plain mutable dicts
-    (streamlit-authenticator mutates them at runtime to track login state)."""
+def _allowed_emails() -> set[str]:
+    """Lowercased set of emails permitted to use the app. Empty if no secrets configured."""
     try:
-        has_auth_secret = "auth" in st.secrets
+        raw = st.secrets.get("allowed_emails", [])
     except Exception:
-        # No secrets.toml configured (typical for local dev) — fall through to YAML.
-        has_auth_secret = False
-    if has_auth_secret:
-        return json.loads(json.dumps(dict(st.secrets["auth"])))
-    if AUTH_CONFIG_PATH.exists():
-        with open(AUTH_CONFIG_PATH, encoding="utf-8") as f:
-            return yaml.safe_load(f)
-    st.error(
-        f"No auth config found. Configure `st.secrets['auth']` (Streamlit Cloud) "
-        f"or create `{AUTH_CONFIG_PATH}` locally:\n\n"
-        "```\npython manage_auth_users.py init\n"
-        "python manage_auth_users.py add --username <user> --name \"<Name>\" --email <email>\n```"
-    )
-    st.stop()
-
-
-def load_authenticator():
-    """Build the Authenticator. Not cached: it instantiates a CookieManager
-    widget internally, which Streamlit forbids inside cached functions."""
-    config = _load_auth_config()
-    return stauth.Authenticate(
-        config["credentials"],
-        config["cookie"]["name"],
-        config["cookie"]["key"],
-        config["cookie"]["expiry_days"],
-    )
+        return set()
+    return {e.strip().lower() for e in raw if e}
 
 
 def feedback_path_for(batch_path, user_slug):
@@ -198,32 +166,33 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---- Login (gates the rest of the UI) ----
-authenticator = load_authenticator()
-
-try:
-    authenticator.login(location="main")
-except Exception as exc:
-    st.error(f"Login error: {exc}")
+# ---- Google sign-in (gates the rest of the UI) ----
+if not st.user.is_logged_in:
+    st.info("Sign in with your Google account to start reviewing.")
+    if st.button("Sign in with Google", type="primary"):
+        st.login("google")
     st.stop()
 
-auth_status = st.session_state.get("authentication_status")
-if auth_status is False:
-    st.error("Username or password is incorrect.")
+email = (st.user.email or "").lower()
+allowed = _allowed_emails()
+if not allowed:
+    st.error("Allowlist is empty. Configure `allowed_emails` in `.streamlit/secrets.toml`.")
     st.stop()
-if auth_status is None:
-    st.info("Please log in to start reviewing.")
+if email not in allowed:
+    st.error(f"Access denied for `{email}`. Contact the project owner to be added.")
+    if st.button("Sign out"):
+        st.logout()
     st.stop()
 
-# Authenticated from here on.
-username = st.session_state["username"]
-display_name = st.session_state.get("name") or username
+username = email
+display_name = st.user.name or email
 user_slug = _slugify(username)
 
 with st.sidebar:
     st.header("Reviewer")
     st.markdown(f"**{display_name}**  \n`{username}`")
-    authenticator.logout(location="sidebar")
+    if st.button("Sign out", key="sidebar_logout"):
+        st.logout()
 
 batches = list_batch_files()
 if not batches:
