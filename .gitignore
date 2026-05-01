@@ -51,6 +51,7 @@ output/
 
 # Auth (real config has password hashes and cookie secret — keep out of git)
 auth_config.yaml
+streamlit_secrets_preview.toml
 
 #executables
 *.exe

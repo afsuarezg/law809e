@@ -10,20 +10,23 @@ believe are present. Feedback is saved per reviewer to
 for downstream use (training data, generator-quality audits, etc.).
 """
 
+import base64
 import copy
 import json
+import os
 import re
 from datetime import datetime
 from pathlib import Path
 
+import requests
 import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 
 
-BATCH_DIR = Path("synthetic_notices/output/LLM_generated")
-FEEDBACK_DIR = BATCH_DIR / "feedback"
-AUTH_CONFIG_PATH = Path("auth_config.yaml")
+BATCH_DIR = Path(os.environ.get("BATCH_DIR", "synthetic_notices/output/LLM_generated"))
+FEEDBACK_DIR = Path(os.environ.get("FEEDBACK_DIR", str(BATCH_DIR / "feedback")))
+AUTH_CONFIG_PATH = Path(os.environ.get("AUTH_CONFIG_PATH", "auth_config.yaml"))
 
 DEFECT_DESCRIPTIONS = {
     "MVP-001": "Missing disjunctive phrasing ('pay OR quit')",
@@ -56,19 +59,36 @@ def _slugify(s: str) -> str:
     return s.strip("_")
 
 
+def _load_auth_config() -> dict:
+    """Return the auth config dict.
+
+    Streamlit Cloud: from st.secrets['auth'] (TOML-based).
+    Local dev: from auth_config.yaml. The yaml.safe_load returns mutable dicts;
+    st.secrets entries are roundtripped via JSON to give plain mutable dicts
+    (streamlit-authenticator mutates them at runtime to track login state)."""
+    try:
+        has_auth_secret = "auth" in st.secrets
+    except Exception:
+        # No secrets.toml configured (typical for local dev) — fall through to YAML.
+        has_auth_secret = False
+    if has_auth_secret:
+        return json.loads(json.dumps(dict(st.secrets["auth"])))
+    if AUTH_CONFIG_PATH.exists():
+        with open(AUTH_CONFIG_PATH, encoding="utf-8") as f:
+            return yaml.safe_load(f)
+    st.error(
+        f"No auth config found. Configure `st.secrets['auth']` (Streamlit Cloud) "
+        f"or create `{AUTH_CONFIG_PATH}` locally:\n\n"
+        "```\npython manage_auth_users.py init\n"
+        "python manage_auth_users.py add --username <user> --name \"<Name>\" --email <email>\n```"
+    )
+    st.stop()
+
+
 def load_authenticator():
-    """Load auth_config.yaml and build the Authenticator. Not cached: the
-    Authenticator instantiates a CookieManager widget internally, which
-    Streamlit forbids inside cached functions."""
-    if not AUTH_CONFIG_PATH.exists():
-        st.error(
-            f"Missing `{AUTH_CONFIG_PATH}`. Initialize it with:\n\n"
-            "```\npython manage_auth_users.py init\n"
-            "python manage_auth_users.py add --username <user> --name \"<Name>\" --email <email>\n```"
-        )
-        st.stop()
-    with open(AUTH_CONFIG_PATH, encoding="utf-8") as f:
-        config = yaml.safe_load(f)
+    """Build the Authenticator. Not cached: it instantiates a CookieManager
+    widget internally, which Streamlit forbids inside cached functions."""
+    config = _load_auth_config()
     return stauth.Authenticate(
         config["credentials"],
         config["cookie"]["name"],
@@ -90,10 +110,58 @@ def load_feedback(batch_path, user_slug):
     return {"batch_file": batch_path.name, "reviewer": user_slug, "reviews": {}}
 
 
+def _github_persistence_configured() -> bool:
+    """True if st.secrets has the keys needed to commit feedback to GitHub."""
+    try:
+        if "github" not in st.secrets:
+            return False
+    except Exception:
+        return False
+    cfg = st.secrets["github"]
+    return all(k in cfg for k in ("token", "owner", "repo", "branch"))
+
+
+def _commit_feedback_to_github(filename: str, content: str, reviewer: str) -> None:
+    """Create or update a single feedback file in the configured GitHub repo
+    via the Contents API. Raises on failure; caller decides how to surface."""
+    cfg = st.secrets["github"]
+    token, owner, repo, branch = cfg["token"], cfg["owner"], cfg["repo"], cfg["branch"]
+    feedback_subdir = cfg.get("feedback_dir", "feedback")
+    remote_path = f"{feedback_subdir}/{filename}"
+    api_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{remote_path}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    sha = None
+    r = requests.get(api_url, headers=headers, params={"ref": branch}, timeout=15)
+    if r.status_code == 200:
+        sha = r.json().get("sha")
+    elif r.status_code != 404:
+        r.raise_for_status()
+    body = {
+        "message": f"Update feedback for {reviewer}",
+        "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+        "branch": branch,
+    }
+    if sha:
+        body["sha"] = sha
+    r = requests.put(api_url, headers=headers, json=body, timeout=15)
+    r.raise_for_status()
+
+
 def save_feedback(batch_path, user_slug, data):
     path = feedback_path_for(batch_path, user_slug)
+    content = json.dumps(data, indent=2)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+        f.write(content)
+    # Durable persistence on Streamlit Cloud (where the local file is ephemeral).
+    if _github_persistence_configured():
+        try:
+            _commit_feedback_to_github(path.name, content, user_slug)
+        except Exception as exc:
+            st.warning(f"Saved locally but GitHub sync failed: {exc}")
 
 
 def count_reviewers_for(batch_path, notice_index):
