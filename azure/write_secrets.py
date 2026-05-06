@@ -49,15 +49,17 @@ def main() -> int:
         print("[write_secrets] ALLOWED_EMAILS is empty after parsing", file=sys.stderr)
         return 1
 
+    # `allowed_emails` must be top-level (review_app.py reads
+    # st.secrets["allowed_emails"]); declare it before any [section] header.
     # Streamlit's `st.login("google")` looks up credentials under
     # [auth.google]; redirect_uri and cookie_secret stay in the parent [auth].
     lines = [
         "# Generated at startup by azure/write_secrets.py — do not commit.",
+        "allowed_emails = [" + ", ".join(_q(e) for e in allowed) + "]",
+        "",
         "[auth]",
         f"redirect_uri = {_q(os.environ['AUTH_REDIRECT_URI'])}",
         f"cookie_secret = {_q(os.environ['AUTH_COOKIE_SECRET'])}",
-        "",
-        "allowed_emails = [" + ", ".join(_q(e) for e in allowed) + "]",
         "",
         "[auth.google]",
         f"client_id = {_q(os.environ['AUTH_CLIENT_ID'])}",
