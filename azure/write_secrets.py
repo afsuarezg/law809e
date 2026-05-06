@@ -49,16 +49,20 @@ def main() -> int:
         print("[write_secrets] ALLOWED_EMAILS is empty after parsing", file=sys.stderr)
         return 1
 
+    # Streamlit's `st.login("google")` looks up credentials under
+    # [auth.google]; redirect_uri and cookie_secret stay in the parent [auth].
     lines = [
         "# Generated at startup by azure/write_secrets.py — do not commit.",
         "[auth]",
-        f"client_id = {_q(os.environ['AUTH_CLIENT_ID'])}",
-        f"client_secret = {_q(os.environ['AUTH_CLIENT_SECRET'])}",
-        f"cookie_secret = {_q(os.environ['AUTH_COOKIE_SECRET'])}",
         f"redirect_uri = {_q(os.environ['AUTH_REDIRECT_URI'])}",
-        f"server_metadata_url = {_q(metadata_url)}",
+        f"cookie_secret = {_q(os.environ['AUTH_COOKIE_SECRET'])}",
         "",
         "allowed_emails = [" + ", ".join(_q(e) for e in allowed) + "]",
+        "",
+        "[auth.google]",
+        f"client_id = {_q(os.environ['AUTH_CLIENT_ID'])}",
+        f"client_secret = {_q(os.environ['AUTH_CLIENT_SECRET'])}",
+        f"server_metadata_url = {_q(metadata_url)}",
     ]
 
     gh_keys = ("GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH")
