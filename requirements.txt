@@ -21,6 +21,7 @@ python-dotenv>=1.0.0
 
 # Review UI
 streamlit>=1.50.0
+Authlib>=1.3.2  # required by streamlit's native OIDC (st.login)
 requests>=2.31.0
 
 # Testing
