@@ -167,7 +167,19 @@ st.markdown(
 )
 
 # ---- Google sign-in (gates the rest of the UI) ----
-if not st.user.is_logged_in:
+# `st.user.is_logged_in` only exists when [auth] is configured in secrets.toml.
+# Without OIDC config, fail fast with a useful message instead of an AttributeError.
+try:
+    is_logged_in = st.user.is_logged_in
+except AttributeError:
+    st.error(
+        "OIDC sign-in is not configured. Add an `[auth]` block to `.streamlit/secrets.toml` "
+        "with `client_id`, `client_secret`, `cookie_secret`, `redirect_uri`, and "
+        "`server_metadata_url`. See `.streamlit/secrets.toml.example` for the template."
+    )
+    st.stop()
+
+if not is_logged_in:
     st.info("Sign in with your Google account to start reviewing.")
     if st.button("Sign in with Google", type="primary"):
         st.login("google")
