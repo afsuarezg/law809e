@@ -21,6 +21,8 @@ from pathlib import Path
 import requests
 import streamlit as st
 
+from synthetic_notices import reviewer_assignment
+
 
 BATCH_DIR = Path(os.environ.get("BATCH_DIR", "synthetic_notices/output/LLM_generated"))
 FEEDBACK_DIR = Path(os.environ.get("FEEDBACK_DIR", str(BATCH_DIR / "feedback")))
@@ -44,6 +46,8 @@ def list_batch_files():
     valid = []
     for p in sorted(BATCH_DIR.glob("*.json")):
         if not p.is_file():
+            continue
+        if p.name.endswith(reviewer_assignment.MANIFEST_SUFFIX):
             continue
         try:
             with open(p, encoding="utf-8") as f:
@@ -248,10 +252,28 @@ except Exception as exc:
     st.error(f"Failed to load `{batch_path.name}`: {exc}")
     st.stop()
 
-total = len(notices)
-if total == 0:
+if not notices:
     st.warning("No notices in this batch.")
     st.stop()
+
+# Apply per-reviewer assignment if a manifest exists alongside the batch.
+# `assigned` is a list of (batch_idx_0based, notice_dict). When no manifest
+# exists, every reviewer sees every notice (legacy behavior preserved).
+manifest = reviewer_assignment.load_manifest(batch_path)
+if manifest is None:
+    assigned = list(enumerate(notices))
+else:
+    indices = reviewer_assignment.assigned_indices_for(manifest, email)
+    if not indices:
+        st.warning(
+            f"You ({email}) have no notices assigned in this batch's manifest. "
+            "Contact the project owner if this is unexpected."
+        )
+        st.stop()
+    assigned = [(i, notices[i]) for i in indices if 0 <= i < len(notices)]
+
+total = len(assigned)
+shared_set = set(manifest.get("shared_indices", [])) if manifest else set()
 
 idx_state_key = f"idx::{batch_path.name}"
 if idx_state_key not in st.session_state:
@@ -282,8 +304,11 @@ with st.sidebar:
     st.markdown(f"**Your reviews:** {reviewed_count} / {total}")
 
 current_idx = st.session_state[idx_state_key]
-current = notices[current_idx]
-notice_index = current_idx + 1
+batch_idx, current = assigned[current_idx]
+# Feedback keys use the original 1-indexed batch position so cross-reviewer
+# analysis joins on the same notice regardless of who saw it.
+notice_index = batch_idx + 1
+display_index = current_idx + 1
 
 # ---- Load existing feedback for this notice ----
 feedback = load_feedback(batch_path, user_slug)
@@ -297,7 +322,10 @@ original_review = copy.deepcopy(review)
 # ---- Header ----
 header_l, header_r = st.columns([3, 1])
 with header_l:
-    st.subheader(f"Notice {notice_index} of {total}")
+    st.subheader(f"Notice {display_index} of {total}")
+    if manifest is not None:
+        tag = "shared" if batch_idx in shared_set else "unique"
+        st.caption(f"Batch index #{notice_index} · {tag}")
 with header_r:
     if review.get("reviewed_at"):
         st.caption(f"You last reviewed: {review['reviewed_at']}")
@@ -308,8 +336,10 @@ with header_r:
         st.caption(f"👥 Reviewed by {n_reviewers} reviewer(s) so far")
 
 # ---- Notice text (left) + defect checkboxes (right) ----
+# Widget keys are scoped by the original batch index so per-notice state
+# stays bound to the notice content (not the reviewer's local position).
 def widget_key(kind, defect):
-    return f"{kind}::{batch_path.stem}::{current_idx}::{defect}"
+    return f"{kind}::{batch_path.stem}::{batch_idx}::{defect}"
 
 text_col, defects_col = st.columns([3, 2])
 
@@ -323,7 +353,7 @@ with text_col:
             height=600,
             disabled=True,
             label_visibility="collapsed",
-            key=f"notice_text::{batch_path.stem}::{current_idx}",
+            key=f"notice_text::{batch_path.stem}::{batch_idx}",
         )
     else:
         st.warning("Notice has no text.")
@@ -343,7 +373,7 @@ st.subheader("📝 Comments")
 review["comment"] = st.text_area(
     "Comments",
     value=review["comment"],
-    key=f"comment::{batch_path.stem}::{current_idx}",
+    key=f"comment::{batch_path.stem}::{batch_idx}",
     height=120,
     label_visibility="collapsed",
     placeholder="Notes about this notice...",

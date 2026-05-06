@@ -1,0 +1,75 @@
+{
+  "batch_size": 50,
+  "shared_ratio": 0.25,
+  "seed": 42,
+  "reviewers": [
+    "andres.fesugo@gmail.com",
+    "mr.arifov@gmail.com",
+    "rafiwolf10@gmail.com",
+    "saniafadai02@gmail.com"
+  ],
+  "shared_indices": [
+    4,
+    9,
+    11,
+    16,
+    19,
+    21,
+    23,
+    25,
+    26,
+    29,
+    31,
+    45
+  ],
+  "per_reviewer": {
+    "andres.fesugo@gmail.com": [
+      5,
+      7,
+      10,
+      12,
+      14,
+      22,
+      32,
+      41,
+      43,
+      47
+    ],
+    "mr.arifov@gmail.com": [
+      2,
+      3,
+      15,
+      18,
+      24,
+      30,
+      34,
+      40,
+      42,
+      44
+    ],
+    "rafiwolf10@gmail.com": [
+      6,
+      13,
+      17,
+      27,
+      28,
+      33,
+      35,
+      39,
+      46
+    ],
+    "saniafadai02@gmail.com": [
+      0,
+      1,
+      8,
+      20,
+      36,
+      37,
+      38,
+      48,
+      49
+    ]
+  },
+  "batch_file": "batch_50_notices.json",
+  "generated_at": "2026-05-06T17:19:39+00:00"
+}
