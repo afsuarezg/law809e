@@ -117,14 +117,32 @@
         "MVP-001": false,
         "MVP-002": false,
         "MVP-003": false,
-        "MVP-004": false,
-        "MVP-005": false,
+        "MVP-004": true,
+        "MVP-005": true,
         "MVP-006": true,
         "MVP-007": false,
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-06T05:34:44",
+      "reviewed_at": "2026-05-06T05:34:45",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    },
+    "8": {
+      "notice_index": 8,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": false,
+        "MVP-002": false,
+        "MVP-003": false,
+        "MVP-004": false,
+        "MVP-005": false,
+        "MVP-006": false,
+        "MVP-007": false,
+        "MVP-008": false,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T05:44:19",
       "reviewer": "andres.fesugo@gmail.com",
       "reviewer_name": "Andres Suarez"
     }
