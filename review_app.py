@@ -102,21 +102,33 @@ def _commit_feedback_to_github(filename: str, content: str, reviewer: str) -> No
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
-    sha = None
-    r = requests.get(api_url, headers=headers, params={"ref": branch}, timeout=15)
-    if r.status_code == 200:
-        sha = r.json().get("sha")
-    elif r.status_code != 404:
-        r.raise_for_status()
     body = {
         "message": f"Update feedback for {reviewer}",
         "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
         "branch": branch,
     }
-    if sha:
-        body["sha"] = sha
-    r = requests.put(api_url, headers=headers, json=body, timeout=15)
-    r.raise_for_status()
+
+    def _fetch_sha() -> str | None:
+        r = requests.get(api_url, headers=headers, params={"ref": branch}, timeout=15)
+        if r.status_code == 200:
+            return r.json().get("sha")
+        if r.status_code == 404:
+            return None
+        r.raise_for_status()
+
+    # Streamlit auto-saves on every checkbox tick; back-to-back saves can race
+    # against GitHub's replication, so a stale sha returns 409. Retry once with
+    # the latest sha before surfacing the failure.
+    for attempt in range(2):
+        sha = _fetch_sha()
+        if sha:
+            body["sha"] = sha
+        else:
+            body.pop("sha", None)
+        r = requests.put(api_url, headers=headers, json=body, timeout=15)
+        if r.status_code != 409 or attempt == 1:
+            r.raise_for_status()
+            return
 
 
 def save_feedback(batch_path, user_slug, data):
