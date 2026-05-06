@@ -1,0 +1,114 @@
+{
+  "batch_file": "batch_30_notices.json",
+  "reviewer": "andres_fesugo_gmail_com",
+  "reviews": {
+    "1": {
+      "notice_index": 1,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": true,
+        "MVP-002": true,
+        "MVP-003": false,
+        "MVP-004": false,
+        "MVP-005": true,
+        "MVP-006": true,
+        "MVP-007": false,
+        "MVP-008": false,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T05:34:31",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    },
+    "2": {
+      "notice_index": 2,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": true,
+        "MVP-002": false,
+        "MVP-003": false,
+        "MVP-004": false,
+        "MVP-005": true,
+        "MVP-006": false,
+        "MVP-007": true,
+        "MVP-008": false,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T04:58:32",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    },
+    "3": {
+      "notice_index": 3,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": false,
+        "MVP-002": false,
+        "MVP-003": false,
+        "MVP-004": false,
+        "MVP-005": false,
+        "MVP-006": true,
+        "MVP-007": true,
+        "MVP-008": true,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T04:58:36",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    },
+    "4": {
+      "notice_index": 4,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": false,
+        "MVP-002": false,
+        "MVP-003": true,
+        "MVP-004": true,
+        "MVP-005": true,
+        "MVP-006": false,
+        "MVP-007": false,
+        "MVP-008": false,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T04:58:39",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    },
+    "5": {
+      "notice_index": 5,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": false,
+        "MVP-002": false,
+        "MVP-003": false,
+        "MVP-004": false,
+        "MVP-005": true,
+        "MVP-006": true,
+        "MVP-007": true,
+        "MVP-008": true,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T04:59:37",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    },
+    "6": {
+      "notice_index": 6,
+      "comment": "",
+      "defects_observed": {
+        "MVP-001": false,
+        "MVP-002": false,
+        "MVP-003": false,
+        "MVP-004": false,
+        "MVP-005": true,
+        "MVP-006": true,
+        "MVP-007": true,
+        "MVP-008": false,
+        "MVP-009": false
+      },
+      "reviewed_at": "2026-05-06T05:21:45",
+      "reviewer": "andres.fesugo@gmail.com",
+      "reviewer_name": "Andres Suarez"
+    }
+  }
+}
