@@ -39,21 +39,19 @@ DEFECT_DESCRIPTIONS = {
 
 
 def list_batch_files():
-    """Return (valid_batches, skipped) where skipped is a list of (path, error_message)."""
     if not BATCH_DIR.exists():
-        return [], []
-    valid, skipped = [], []
+        return []
+    valid = []
     for p in sorted(BATCH_DIR.glob("*.json")):
         if not p.is_file():
             continue
         try:
             with open(p, encoding="utf-8") as f:
                 json.load(f)
-        except (OSError, json.JSONDecodeError) as exc:
-            skipped.append((p, str(exc)))
+        except (OSError, json.JSONDecodeError):
             continue
         valid.append(p)
-    return valid, skipped
+    return valid
 
 
 def load_batch(path):
@@ -230,13 +228,7 @@ with st.sidebar:
     if st.button("Sign out", key="sidebar_logout"):
         st.logout()
 
-batches, skipped_batches = list_batch_files()
-if skipped_batches:
-    with st.sidebar:
-        st.warning(
-            "Skipped malformed batch file(s):\n"
-            + "\n".join(f"- `{p.name}`: {err}" for p, err in skipped_batches)
-        )
+batches = list_batch_files()
 if not batches:
     st.warning(f"No valid batches found in `{BATCH_DIR}/`.")
     st.stop()
