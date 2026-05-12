@@ -22,7 +22,7 @@
     },
     "2": {
       "notice_index": 2,
-      "comment": "In person rent says payment is to be paid to an LLC not a specific person. \nI'm not sure if just writing Fo",
+      "comment": "In person rent says payment is to be paid to an LLC not a specific person. \nI'm not sure if just writing Forfeiture warning counts. I normally see something along the lines of: the Landlord elects to declare a forfeiture of your lease or rental agreement. ",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": false,
@@ -34,7 +34,7 @@
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-12T22:41:31",
+      "reviewed_at": "2026-05-12T22:43:26",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
