@@ -4,7 +4,7 @@
   "reviews": {
     "1": {
       "notice_index": 1,
-      "comment": " Haven't seen this -> with treble damages. I've seen reasonable attorneys fees ",
+      "comment": " Haven't seen this -> with treble damages. I've seen reasonable attorneys fees \nSection 594 is not something I've seen in a pay or quit so far.",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": true,
@@ -16,7 +16,7 @@
         "MVP-008": true,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-12T22:13:29",
+      "reviewed_at": "2026-05-12T22:17:49",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
