@@ -7,7 +7,7 @@
       "comment": " Haven't seen this -> with treble damages ",
       "defects_observed": {
         "MVP-001": false,
-        "MVP-002": false,
+        "MVP-002": true,
         "MVP-003": false,
         "MVP-004": false,
         "MVP-005": false,
