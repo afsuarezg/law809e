@@ -222,7 +222,7 @@
       "notice_index": 24,
       "comment": "",
       "defects_observed": {
-        "MVP-001": false,
+        "MVP-001": true,
         "MVP-002": true,
         "MVP-003": false,
         "MVP-004": false,
@@ -232,7 +232,7 @@
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-12T23:43:33",
+      "reviewed_at": "2026-05-12T23:43:35",
       "reviewer": "andres.fesugo@gmail.com",
       "reviewer_name": "Andres Suarez"
     }
