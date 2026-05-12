@@ -22,7 +22,7 @@
     },
     "2": {
       "notice_index": 2,
-      "comment": "",
+      "comment": "In person rent says payment is to be paid to an LLC not a specific person. \nI'm not sure if just writing Fo",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": false,
@@ -34,7 +34,7 @@
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-12T22:40:32",
+      "reviewed_at": "2026-05-12T22:41:31",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
