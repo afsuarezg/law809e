@@ -480,11 +480,11 @@
         "MVP-004": true,
         "MVP-005": true,
         "MVP-006": true,
-        "MVP-007": false,
+        "MVP-007": true,
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-13T02:51:25",
+      "reviewed_at": "2026-05-13T02:51:27",
       "reviewer": "andres.fesugo@gmail.com",
       "reviewer_name": "Andres Suarez"
     }
