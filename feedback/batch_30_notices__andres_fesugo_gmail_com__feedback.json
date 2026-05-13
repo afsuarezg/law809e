@@ -328,7 +328,7 @@
     },
     "19": {
       "notice_index": 19,
-      "comment": "",
+      "comment": "Includes late fee.",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": false,
@@ -340,7 +340,7 @@
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-13T02:33:17",
+      "reviewed_at": "2026-05-13T02:36:18",
       "reviewer": "andres.fesugo@gmail.com",
       "reviewer_name": "Andres Suarez"
     }
