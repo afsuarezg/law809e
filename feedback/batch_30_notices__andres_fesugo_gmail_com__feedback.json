@@ -6,7 +6,7 @@
       "notice_index": 1,
       "comment": "",
       "defects_observed": {
-        "MVP-001": true,
+        "MVP-001": false,
         "MVP-002": true,
         "MVP-003": false,
         "MVP-004": false,
@@ -16,7 +16,7 @@
         "MVP-008": false,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-06T05:34:31",
+      "reviewed_at": "2026-05-13T02:03:02",
       "reviewer": "andres.fesugo@gmail.com",
       "reviewer_name": "Andres Suarez"
     },
