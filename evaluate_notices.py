@@ -17,10 +17,15 @@ import argparse
 import json
 import logging
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
+
+# Concurrency cap for per-notice LLM extraction. Low enough to respect
+# free-tier rate limits on the supported providers.
+_NOTICE_WORKERS = 5
 
 # ---------------------------------------------------------------------------
 # Ground-truth defect name → MVP-XXX mapping
@@ -213,7 +218,7 @@ def evaluate(
         if resolved_model is None:
             defaults = {
                 "anthropic": "claude-sonnet-4-6",
-                "openai": "gpt-4-turbo-preview",
+                "openai": "gpt-4o-mini",
                 "google": "gemini-2.5-flash",
             }
             resolved_model = defaults.get(provider)
@@ -247,13 +252,14 @@ def evaluate(
         errors = 0
         notice_results: List[Dict[str, Any]] = []
 
-        for idx, item in enumerate(notices_raw):
+        def _process(idx_item: Tuple[int, Dict[str, Any]]) -> Dict[str, Any]:
+            """Run extraction + validation for one notice. Pure per-notice work — safe to parallelize."""
+            idx, item = idx_item
             text: str = item.get("text", "")
             raw_defects: List[str] = item.get("defects", [])
             expected_ids: Set[str] = {
                 DEFECT_MAPPING[d] for d in raw_defects if d in DEFECT_MAPPING
             }
-
             unknown = [d for d in raw_defects if d not in DEFECT_MAPPING]
             if unknown:
                 logging.warning(f"Notice #{idx + 1}: unknown defect name(s) {unknown} — skipped in mapping")
@@ -269,8 +275,30 @@ def evaluate(
                 detected_ids = _validate(extracted)
             except Exception as exc:
                 error_msg = str(exc)
-                errors += 1
                 logging.error(f"Notice #{idx + 1} failed: {exc}")
+
+            return {
+                "idx": idx,
+                "expected_ids": expected_ids,
+                "detected_ids": detected_ids,
+                "error_msg": error_msg,
+                "extracted_dict": extracted_dict,
+            }
+
+        # Run extraction in parallel; max_workers=5 keeps us under most rate limits.
+        # executor.map preserves input order, so per-notice aggregation below remains deterministic.
+        with ThreadPoolExecutor(max_workers=_NOTICE_WORKERS) as pool:
+            per_notice = list(pool.map(_process, enumerate(notices_raw)))
+
+        for r in per_notice:
+            idx = r["idx"]
+            expected_ids = r["expected_ids"]
+            detected_ids = r["detected_ids"]
+            error_msg = r["error_msg"]
+            extracted_dict = r["extracted_dict"]
+
+            if error_msg:
+                errors += 1
 
             tp_ids = detected_ids & expected_ids
             fp_ids = detected_ids - expected_ids

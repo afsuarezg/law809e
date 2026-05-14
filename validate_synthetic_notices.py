@@ -27,9 +27,14 @@ Usage:
 import argparse
 import json
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from collections import defaultdict
+
+# Concurrency cap for per-notice LLM extraction. Low enough to respect
+# free-tier rate limits on the supported providers.
+_NOTICE_WORKERS = 5
 
 # Import directly to avoid importing OCRProcessor (which requires pytesseract)
 # Note: This still imports __init__.py, but we handle the error gracefully
@@ -181,23 +186,24 @@ def validate_batch(
         print(f"Using LLM extraction{provider_info}")
         print("Note: LLM extraction requires API access (OpenAI, Anthropic, or Ollama)\n")
     
-    results = []
-    for i, notice in enumerate(notices, 1):
-        print(f"Processing notice {i}/{len(notices)}...", end='\r')
-        
-        notice_text = notice.get('text', '')
-        expected_defects = notice.get('defects', [])
-        
+    def _process(idx_notice):
+        i, notice = idx_notice
         result = validate_synthetic_notice(
-            notice_text,
-            expected_defects,
+            notice.get('text', ''),
+            notice.get('defects', []),
             use_regex=use_regex,
-            llm_provider=llm_provider
+            llm_provider=llm_provider,
         )
         result['notice_index'] = i
-        results.append(result)
-    
-    print(f"\nCompleted validation of {len(notices)} notices\n")
+        return result
+
+    # Parallelize per-notice extraction. max_workers=5 stays under free-tier rate limits.
+    # executor.map preserves input order so notice_index lines up with original.
+    print(f"Processing {len(notices)} notices in parallel (up to {_NOTICE_WORKERS} concurrent)...")
+    with ThreadPoolExecutor(max_workers=_NOTICE_WORKERS) as pool:
+        results = list(pool.map(_process, enumerate(notices, 1)))
+
+    print(f"Completed validation of {len(notices)} notices\n")
     
     # Calculate aggregate statistics
     total = len(results)

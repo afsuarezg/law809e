@@ -72,11 +72,11 @@ class LLMNoticeGenerator:
     def _get_default_model(self) -> str:
         """Get default model for provider."""
         defaults = {
-            "openai": "gpt-4",
+            "openai": "gpt-4o",
             "anthropic": "claude-sonnet-4-6",
-            "google": "gemini-pro"
+            "google": "gemini-2.5-flash"
         }
-        return defaults.get(self.provider, "gpt-4")
+        return defaults.get(self.provider, "gpt-4o")
 
     def _get_api_key(self) -> Optional[str]:
         """Get API key from environment."""

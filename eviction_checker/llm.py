@@ -13,7 +13,86 @@ import json
 import logging
 from typing import Optional, Dict, Any
 
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception,
+    before_sleep_log,
+)
+
 logger = logging.getLogger(__name__)
+
+
+def _is_transient_llm_error(exc: BaseException) -> bool:
+    """True for retryable errors (rate-limit, timeout, transient 5xx). False for auth/bad-request/not-found."""
+    # Anthropic
+    try:
+        import anthropic
+        if isinstance(exc, (
+            anthropic.RateLimitError,
+            anthropic.APITimeoutError,
+            anthropic.APIConnectionError,
+            anthropic.InternalServerError,
+        )):
+            return True
+        if isinstance(exc, (
+            anthropic.AuthenticationError,
+            anthropic.BadRequestError,
+            anthropic.NotFoundError,
+            anthropic.PermissionDeniedError,
+        )):
+            return False
+    except ImportError:
+        pass
+    # OpenAI (also used by Ollama)
+    try:
+        import openai
+        if isinstance(exc, (
+            openai.RateLimitError,
+            openai.APITimeoutError,
+            openai.APIConnectionError,
+            openai.InternalServerError,
+        )):
+            return True
+        if isinstance(exc, (
+            openai.AuthenticationError,
+            openai.BadRequestError,
+            openai.NotFoundError,
+            openai.PermissionDeniedError,
+        )):
+            return False
+    except ImportError:
+        pass
+    # Google
+    try:
+        from google.api_core import exceptions as gexc
+        if isinstance(exc, (
+            gexc.ResourceExhausted,
+            gexc.DeadlineExceeded,
+            gexc.ServiceUnavailable,
+            gexc.InternalServerError,
+        )):
+            return True
+        if isinstance(exc, (
+            gexc.Unauthenticated,
+            gexc.PermissionDenied,
+            gexc.NotFound,
+            gexc.InvalidArgument,
+        )):
+            return False
+    except ImportError:
+        pass
+    return False
+
+
+_LLM_RETRY = retry(
+    stop=stop_after_attempt(4),
+    wait=wait_exponential(multiplier=1, min=2, max=30),
+    retry=retry_if_exception(_is_transient_llm_error),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True,
+)
 
 
 class LLMClient:
@@ -154,6 +233,7 @@ class LLMClient:
         response = self.complete(json_prompt, system_message)
         return self._extract_json(response)
 
+    @_LLM_RETRY
     def _complete_ollama(self, prompt: str, system_message: Optional[str]) -> str:
         """Get completion from local Ollama."""
         messages = []
@@ -172,6 +252,7 @@ class LLMClient:
             self.total_output_tokens += response.usage.completion_tokens or 0
         return response.choices[0].message.content
 
+    @_LLM_RETRY
     def _complete_openai(self, prompt: str, system_message: Optional[str]) -> str:
         """Get completion from OpenAI."""
         messages = []
@@ -179,7 +260,7 @@ class LLMClient:
             messages.append({"role": "system", "content": system_message})
         messages.append({"role": "user", "content": prompt})
 
-        model = os.getenv("OPENAI_MODEL", "gpt-4-turbo-preview")
+        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         response = self.openai_client.chat.completions.create(
             model=model,
             messages=messages,
@@ -214,8 +295,23 @@ class LLMClient:
         if model not in self._NO_TEMPERATURE_MODELS:
             kwargs["temperature"] = self.temperature
         if system_message:
-            kwargs["system"] = system_message
+            # Structured form enables prompt caching: identical system blocks
+            # across calls hit the cache instead of being re-billed in full.
+            kwargs["system"] = [
+                {
+                    "type": "text",
+                    "text": system_message,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ]
         return kwargs
+
+    @_LLM_RETRY
+    def _anthropic_messages_create(self, model: str, prompt: str, system_message: Optional[str]):
+        """Single Anthropic API call, retried on transient errors. 404s pass through so the caller can fall back."""
+        return self.anthropic_client.messages.create(
+            **self._anthropic_kwargs(model, prompt, system_message)
+        )
 
     def _complete_anthropic(self, prompt: str, system_message: Optional[str]) -> str:
         """Get completion from Anthropic."""
@@ -234,9 +330,7 @@ class LLMClient:
             for default_model in default_models:
                 try:
                     model = default_model
-                    response = self.anthropic_client.messages.create(
-                        **self._anthropic_kwargs(model, prompt, system_message)
-                    )
+                    response = self._anthropic_messages_create(model, prompt, system_message)
                     logger.info(f"Successfully using Anthropic model: {model}")
                     self.total_input_tokens += response.usage.input_tokens or 0
                     self.total_output_tokens += response.usage.output_tokens or 0
@@ -255,9 +349,7 @@ class LLMClient:
             raise last_error or ValueError("No Anthropic model available")
 
         try:
-            response = self.anthropic_client.messages.create(
-                **self._anthropic_kwargs(model, prompt, system_message)
-            )
+            response = self._anthropic_messages_create(model, prompt, system_message)
             self.total_input_tokens += response.usage.input_tokens or 0
             self.total_output_tokens += response.usage.output_tokens or 0
             return response.content[0].text
@@ -270,9 +362,17 @@ class LLMClient:
                     logger.error(f"Available models: {', '.join(available_models[:5])}")
             raise
 
+    @_LLM_RETRY
+    def _google_generate_content(self, model: str, prompt: str, config):
+        """Single Google generate_content call, retried on transient errors. 404s pass through so the caller can fall back."""
+        return self.google_client.models.generate_content(
+            model=model,
+            contents=prompt,
+            config=config,
+        )
+
     def _complete_google(self, prompt: str, system_message: Optional[str]) -> str:
         """Get completion from Google Gemini."""
-        from google import genai
         from google.genai import types
 
         config_kwargs: Dict[str, Any] = {
@@ -295,14 +395,11 @@ class LLMClient:
                 "gemini-flash-latest",
             ]
 
+        config = types.GenerateContentConfig(**config_kwargs)
         last_error = None
         for model in models_to_try:
             try:
-                response = self.google_client.models.generate_content(
-                    model=model,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(**config_kwargs),
-                )
+                response = self._google_generate_content(model, prompt, config)
                 logger.info(f"Successfully using Google model: {model}")
                 self.google_model = model  # cache for next call
                 if hasattr(response, "usage_metadata") and response.usage_metadata:

@@ -122,6 +122,10 @@ Return ONLY valid JSON."""
             # explicit RuntimeError so it can be surfaced to the user.
             return {}
 
+    # Fields that are usually required to render a meaningful defect report;
+    # if the LLM returns None for these, downstream validation may misclassify.
+    _CRITICAL_FIELDS = ("landlord_name", "total_amount_demanded")
+
     def _to_extracted_notice(self, data: Dict[str, Any]) -> ExtractedNotice:
         """Convert dictionary to ExtractedNotice model."""
         # Parse dates
@@ -161,10 +165,26 @@ Return ONLY valid JSON."""
                 logger.warning(f"Could not parse payment terms: {e}")
                 data['payment_terms'] = None
 
+        # Flag missing critical fields up front — downstream defect reports
+        # are misleading if these are silently None.
+        missing_critical = [f for f in self._CRITICAL_FIELDS if not data.get(f)]
+        if missing_critical:
+            logger.warning(
+                "LLM extraction returned None for critical field(s): %s. "
+                "Defect detection may be unreliable.",
+                ", ".join(missing_critical),
+            )
+
         try:
             return ExtractedNotice(**data)
         except Exception as e:
-            logger.error(f"Could not create ExtractedNotice: {e}")
+            logger.error(
+                "Could not create ExtractedNotice (%s: %s). "
+                "Falling back to raw-text-only notice. Keys present in extracted data: %s",
+                type(e).__name__,
+                e,
+                sorted(data.keys()),
+            )
             return ExtractedNotice(
                 raw_text=data.get('raw_text', ''),
                 notice_type=NoticeType.THREE_DAY_PAY
