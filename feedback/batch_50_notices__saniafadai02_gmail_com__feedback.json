@@ -13,10 +13,10 @@
         "MVP-005": false,
         "MVP-006": false,
         "MVP-007": false,
-        "MVP-008": false,
+        "MVP-008": true,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-14T16:23:45",
+      "reviewed_at": "2026-05-14T16:24:13",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
