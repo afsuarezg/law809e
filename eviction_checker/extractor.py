@@ -105,7 +105,8 @@ IMPORTANT:
 - For "total_amount_demanded": look for embedded sentences like "the total amount of rent due and unpaid is: $X", "amount of $X", "the sum of $X", or a standalone dollar figure
 - For "days_to_comply": extract the integer from phrases like "WITHIN THREE (3) BUSINESS DAYS" → 3, "within one (1) day" → 1, "within 3 days" → 3
 - For "service_date": look in a proof-of-service section at the bottom: "I served this notice on [date]", "Date Served: [date]", or "served on [date]"
-- For "payment_terms.payee_name": extract the entity name from "made payable to X", "paid to X", "payable to [company]", or "payable to [Name]"
+- For "payment_terms.payee_name": extract the entity name from "made payable to X", "paid to X", "payable to [company]", "payable to [Name]", "remit (payment) to X", "send (rent/payment) to X", or "pay landlord/owner at [name]"
+- For "payment_terms.payment_hours": look for explicit days/hours when payment may be made. Common phrasings include "Usual days and hours for rent collection are: [hours]", "Hours of operation: [hours]", "Office hours: [hours]", or "Payment may be made between [hours]". Capture the exact day/time range if present, even when it follows an "In person" checkbox or list bullet.
 - For "has_forfeiture_declaration": set true if the notice contains ANY of the following:
   (a) explicit forfeiture language: "forfeit", "forfeited", "forfeiture of the lease", "declared forfeited", "deemed forfeited", "declare a forfeiture", "lease shall be void"; OR
   (b) tenancy-termination language: "tenancy is terminated", "tenancy will be terminated", "tenancy will be declared terminated"; OR

@@ -59,6 +59,7 @@ class NoticeValidator:
         patterns = [
             r'pay\s+(rent\s+)?or\s+quit',
             r'pay\s+(rent\s+)?or\s+vacate',
+            r'pay\s+(rent\s+)?or\s+(surrender|relinquish|give\s+up|deliver\s+up)\s+(possession|the\s+premises)',
             r'pay\s+or\s+move\s+out',
         ]
 
