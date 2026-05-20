@@ -25,7 +25,7 @@
       "comment": "",
       "defects_observed": {
         "MVP-001": false,
-        "MVP-002": false,
+        "MVP-002": true,
         "MVP-003": false,
         "MVP-004": false,
         "MVP-005": false,
@@ -34,7 +34,7 @@
         "MVP-008": true,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-20T01:04:19",
+      "reviewed_at": "2026-05-20T01:04:38",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
