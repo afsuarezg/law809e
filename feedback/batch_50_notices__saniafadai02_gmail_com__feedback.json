@@ -76,7 +76,7 @@
     },
     "10": {
       "notice_index": 10,
-      "comment": "The box isn't checked but it does state the usual time, would this be considered missing payment hours? They're requiring the payment to be sent by mail so please confirm\nAlso undersigned is not something I've encountered",
+      "comment": "The box isn't checked but it does state the usual time, would this be considered missing payment hours? They're requiring the payment to be sent by mail so please confirm",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": true,
@@ -88,7 +88,7 @@
         "MVP-008": true,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-20T01:36:12",
+      "reviewed_at": "2026-05-20T01:37:32",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     },
