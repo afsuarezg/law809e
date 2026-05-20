@@ -4,7 +4,7 @@
   "reviews": {
     "1": {
       "notice_index": 1,
-      "comment": "002 - It's doesn't have excluding Saturday, Sunday and judicial holidays \n",
+      "comment": "002 - It's doesn't have excluding Saturday, Sunday and judicial holidays \n004 - lists an entity as the person they need to pay rent to\n",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": true,
@@ -16,7 +16,7 @@
         "MVP-008": true,
         "MVP-009": false
       },
-      "reviewed_at": "2026-05-20T01:02:07",
+      "reviewed_at": "2026-05-20T01:03:49",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
