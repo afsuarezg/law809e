@@ -60,7 +60,7 @@
       "notice_index": 9,
       "comment": "\u2691 Includes late fees",
       "defects_observed": {
-        "MVP-001": true,
+        "MVP-001": false,
         "MVP-002": false,
         "MVP-003": false,
         "MVP-004": false,
@@ -70,7 +70,7 @@
         "MVP-008": true,
         "MVP-009": true
       },
-      "reviewed_at": "2026-05-20T01:15:57",
+      "reviewed_at": "2026-05-20T01:15:59",
       "reviewer": "saniafadai02@gmail.com",
       "reviewer_name": "Sania"
     }
