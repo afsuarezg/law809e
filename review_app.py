@@ -43,6 +43,7 @@ DEFECT_DESCRIPTIONS = {
     "MVP-010": "Missing compliance deadline / expiry date for the notice",
     "MVP-011": "Font size below 12-point — notice is not legibly printed",
     "MVP-012": "Payment method not clearly stated (e.g. doesn't specify check, money order, cash, etc.)",
+    "MVP-013": "Missing date of service — notice does not state when it was served on the tenant",
 }
 
 

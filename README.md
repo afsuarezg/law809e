@@ -187,7 +187,7 @@ defects = validator.validate(notice)
 
 ## Defects Detected
 
-MVP-001..MVP-009 are validated automatically. MVP-010..MVP-012 are reviewer-only labels exposed in the Streamlit annotation tool (`review_app.py`); no automated detection yet.
+MVP-010..MVP-012 are reviewer-only labels exposed in the Streamlit annotation tool (`review_app.py`) with no automated detection yet; all other IDs (MVP-001..MVP-009 and MVP-013) are validated automatically.
 
 | ID | Defect | Severity | Description |
 |----|--------|----------|-------------|
@@ -203,6 +203,7 @@ MVP-001..MVP-009 are validated automatically. MVP-010..MVP-012 are reviewer-only
 | MVP-010 | Missing Expiry Date | Critical | Missing compliance deadline / expiry date for the notice *(reviewer-only)* |
 | MVP-011 | Font Too Small | Critical | Font size below 12-point — notice is not legibly printed *(reviewer-only)* |
 | MVP-012 | Vague Payment Method | Critical | Payment method not clearly stated (e.g. doesn't specify check, money order, cash, etc.) *(reviewer-only)* |
+| MVP-013 | Missing Service Date | Critical | Notice does not state the date it was served on the tenant — the 3-day compliance clock cannot be computed |
 
 ## Legal References
 

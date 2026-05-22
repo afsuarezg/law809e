@@ -42,6 +42,7 @@ class NoticeValidator:
             self._check_electronic_payment,          # Defect 7
             self._check_rent_age,                    # Defect 8
             self._check_forfeiture_declaration,      # Defect 9
+            self._check_service_date_present,        # Defect 13
         ]
 
         for check in checks:
@@ -341,4 +342,19 @@ class NoticeValidator:
             statute_violated="CCP 1161(2)",
             tenant_action="The lack of forfeiture language may invalidate the notice.",
             evidence="No forfeiture or lease termination language found"
+        )
+
+    def _check_service_date_present(self, notice: ExtractedNotice) -> Optional[Defect]:
+        """Check that the notice states the date it was served on the tenant."""
+        if notice.service_date is not None:
+            return None
+
+        return Defect(
+            defect_id="MVP-013",
+            title="Missing Date of Service",
+            severity=Severity.CRITICAL,
+            description="The notice does not state when it was served on the tenant; the 3-day compliance clock cannot be computed.",
+            statute_violated="CCP 1161(2)",
+            tenant_action="Without a service date the notice is unenforceable on its face.",
+            evidence="No service date / proof-of-service date extracted from the notice"
         )

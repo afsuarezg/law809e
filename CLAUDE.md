@@ -77,7 +77,7 @@ Three generators for creating test data:
 
 ### Defect Rules
 
-MVP-001..MVP-009 are validated automatically by `eviction_checker/validator.py`. MVP-010..MVP-012 are reviewer-only labels in `review_app.py` (no automated detection yet).
+MVP-010..MVP-012 are reviewer-only labels in `review_app.py` (no automated detection yet); all other IDs (MVP-001..MVP-009 and MVP-013) are validated automatically by `eviction_checker/validator.py`.
 
 | ID | Description |
 |----|-------------|
@@ -93,3 +93,4 @@ MVP-001..MVP-009 are validated automatically by `eviction_checker/validator.py`.
 | MVP-010 | Missing compliance deadline / expiry date for the notice *(reviewer-only)* |
 | MVP-011 | Font size below 12-point — notice is not legibly printed *(reviewer-only)* |
 | MVP-012 | Payment method not clearly stated (e.g. doesn't specify check, money order, cash, etc.) *(reviewer-only)* |
+| MVP-013 | Missing date of service — notice does not state when it was served on the tenant |
