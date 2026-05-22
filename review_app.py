@@ -27,16 +27,22 @@ from synthetic_notices import reviewer_assignment
 BATCH_DIR = Path(os.environ.get("BATCH_DIR", "synthetic_notices/output/LLM_generated"))
 FEEDBACK_DIR = Path(os.environ.get("FEEDBACK_DIR", str(BATCH_DIR / "feedback")))
 
+# TODO: "Inaccurate amount requested" cannot be judged from the notice alone;
+# plan to capture it via a future intake-form question ("Do you agree with this amount?")
+# rather than a reviewer checkbox.
 DEFECT_DESCRIPTIONS = {
-    "MVP-001": "Missing disjunctive phrasing ('pay OR quit')",
-    "MVP-002": "Insufficient notice period (< 3 business days)",
-    "MVP-003": "No exact dollar amount stated",
-    "MVP-004": "Missing payee name/phone/address",
-    "MVP-005": "Missing payment hours",
-    "MVP-006": "Missing financial institution info",
-    "MVP-007": "Electronic payment not previously established",
-    "MVP-008": "Rent demanded > 1 year old",
+    "MVP-001": "Improper phrasing — notice does not give the option to quit (must offer 'pay OR quit')",
+    "MVP-002": "Lack of adequate time — fewer than 3 business days to comply, excluding Saturdays, Sundays, and California judicial holidays",
+    "MVP-003": "Does not state the amount of rent that is due",
+    "MVP-004": "Missing payee identity or contact info (name, phone, or address)",
+    "MVP-005": "In-person payment offered but business hours not stated",
+    "MVP-006": "Bank-deposit payment offered but financial-institution info incomplete (address, account number, or 5-mile statement)",
+    "MVP-007": "Electronic payment offered without prior tenant agreement ('previously established')",
+    "MVP-008": "Rent demanded is more than 1 year old",
     "MVP-009": "No forfeiture declaration",
+    "MVP-010": "Missing compliance deadline / expiry date for the notice",
+    "MVP-011": "Font size below 12-point — notice is not legibly printed",
+    "MVP-012": "Payment method not clearly stated (e.g. doesn't specify check, money order, cash, etc.)",
 }
 
 

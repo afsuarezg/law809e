@@ -187,17 +187,22 @@ defects = validator.validate(notice)
 
 ## Defects Detected
 
+MVP-001..MVP-009 are validated automatically. MVP-010..MVP-012 are reviewer-only labels exposed in the Streamlit annotation tool (`review_app.py`); no automated detection yet.
+
 | ID | Defect | Severity | Description |
 |----|--------|----------|-------------|
-| MVP-001 | Not Disjunctive | Critical | Notice must say "pay OR quit", giving tenant the choice |
-| MVP-002 | Insufficient Period | Critical | Must give 3 full business days (excluding weekends/holidays) |
-| MVP-003 | No Amount Stated | Critical | Must state exact dollar amount of rent owed |
-| MVP-004 | Missing Payee Info | Critical | Must include name, telephone number, and address for payment |
-| MVP-005 | Missing Payment Hours | Critical | If in-person payment allowed, must state usual days and hours |
-| MVP-006 | Financial Institution | Critical | If bank payment allowed, must state name, street address, account number, and be within 5 miles |
-| MVP-007 | Electronic Payment | Critical | If electronic funds transfer allowed, must state it was previously established |
-| MVP-008 | Rent Over 1 Year | Critical | Cannot demand rent that came due more than one year ago |
-| MVP-009 | No Forfeiture | Critical | Notice must declare a forfeiture of the lease/tenancy |
+| MVP-001 | Improper Phrasing | Critical | Notice does not give the option to quit — must offer "pay OR quit", giving the tenant the choice |
+| MVP-002 | Lack of Adequate Time | Critical | Fewer than 3 business days to comply, excluding Saturdays, Sundays, and California judicial holidays |
+| MVP-003 | Amount Not Stated | Critical | Does not state the amount of rent that is due |
+| MVP-004 | Missing Payee Info | Critical | Missing payee identity or contact info (name, telephone number, or address) |
+| MVP-005 | Missing Payment Hours | Critical | In-person payment offered but business hours not stated |
+| MVP-006 | Financial Institution | Critical | Bank-deposit payment offered but financial-institution info incomplete (address, account number, or 5-mile statement) |
+| MVP-007 | Electronic Payment | Critical | Electronic payment offered without prior tenant agreement ("previously established") |
+| MVP-008 | Rent Over 1 Year | Critical | Rent demanded is more than 1 year old |
+| MVP-009 | No Forfeiture | Critical | Notice does not declare a forfeiture of the lease/tenancy |
+| MVP-010 | Missing Expiry Date | Critical | Missing compliance deadline / expiry date for the notice *(reviewer-only)* |
+| MVP-011 | Font Too Small | Critical | Font size below 12-point — notice is not legibly printed *(reviewer-only)* |
+| MVP-012 | Vague Payment Method | Critical | Payment method not clearly stated (e.g. doesn't specify check, money order, cash, etc.) *(reviewer-only)* |
 
 ## Legal References
 

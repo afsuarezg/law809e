@@ -75,16 +75,21 @@ Three generators for creating test data:
 
 `validate_synthetic_notices.py` (root level) batch-validates generated JSON notice files through the full analysis pipeline and produces `validation_report_*.json` files.
 
-### The 9 Defect Rules
+### Defect Rules
+
+MVP-001..MVP-009 are validated automatically by `eviction_checker/validator.py`. MVP-010..MVP-012 are reviewer-only labels in `review_app.py` (no automated detection yet).
 
 | ID | Description |
 |----|-------------|
-| MVP-001 | Missing disjunctive phrasing ("pay OR quit") |
-| MVP-002 | Insufficient notice period (fewer than 3 business days) |
-| MVP-003 | No exact dollar amount stated |
-| MVP-004 | Missing payee name/phone/address |
-| MVP-005 | Missing payment hours (required when in-person payment is offered) |
-| MVP-006 | Missing financial institution info (required when bank payment is offered) |
-| MVP-007 | Electronic payment not previously established |
+| MVP-001 | Improper phrasing — notice does not give the option to quit (must offer "pay OR quit") |
+| MVP-002 | Lack of adequate time — fewer than 3 business days to comply, excluding Saturdays, Sundays, and California judicial holidays |
+| MVP-003 | Does not state the amount of rent that is due |
+| MVP-004 | Missing payee identity or contact info (name, phone, or address) |
+| MVP-005 | In-person payment offered but business hours not stated |
+| MVP-006 | Bank-deposit payment offered but financial-institution info incomplete (address, account number, or 5-mile statement) |
+| MVP-007 | Electronic payment offered without prior tenant agreement ("previously established") |
 | MVP-008 | Rent demanded is more than 1 year old |
 | MVP-009 | No forfeiture declaration |
+| MVP-010 | Missing compliance deadline / expiry date for the notice *(reviewer-only)* |
+| MVP-011 | Font size below 12-point — notice is not legibly printed *(reviewer-only)* |
+| MVP-012 | Payment method not clearly stated (e.g. doesn't specify check, money order, cash, etc.) *(reviewer-only)* |
