@@ -319,7 +319,7 @@
         "MVP-003": false,
         "MVP-004": false,
         "MVP-005": false,
-        "MVP-006": false,
+        "MVP-006": true,
         "MVP-007": false,
         "MVP-008": false,
         "MVP-009": false,
@@ -328,7 +328,7 @@
         "MVP-012": false,
         "MVP-013": false
       },
-      "reviewed_at": "2026-05-27T04:18:29",
+      "reviewed_at": "2026-05-27T18:44:24",
       "reviewer": "javokhir@stanford.edu",
       "reviewer_name": "Javokhir B Arifov"
     },
