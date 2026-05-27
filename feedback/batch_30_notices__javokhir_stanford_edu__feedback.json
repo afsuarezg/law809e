@@ -224,7 +224,7 @@
     },
     "11": {
       "notice_index": 11,
-      "comment": "",
+      "comment": "late fee included",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": true,
@@ -240,7 +240,7 @@
         "MVP-012": false,
         "MVP-013": false
       },
-      "reviewed_at": "2026-05-27T04:09:40",
+      "reviewed_at": "2026-05-27T04:10:46",
       "reviewer": "javokhir@stanford.edu",
       "reviewer_name": "Javokhir B Arifov"
     }
