@@ -202,7 +202,7 @@
     },
     "10": {
       "notice_index": 10,
-      "comment": "",
+      "comment": "Doesn't state exclude weekends, but does exclude in the expiry date.",
       "defects_observed": {
         "MVP-001": false,
         "MVP-002": false,
@@ -218,7 +218,7 @@
         "MVP-012": false,
         "MVP-013": false
       },
-      "reviewed_at": "2026-05-27T04:08:39",
+      "reviewed_at": "2026-05-27T04:08:56",
       "reviewer": "javokhir@stanford.edu",
       "reviewer_name": "Javokhir B Arifov"
     }
