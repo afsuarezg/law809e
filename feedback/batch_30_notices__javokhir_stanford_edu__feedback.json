@@ -270,7 +270,7 @@
       "notice_index": 13,
       "comment": "",
       "defects_observed": {
-        "MVP-001": false,
+        "MVP-001": true,
         "MVP-002": false,
         "MVP-003": false,
         "MVP-004": false,
@@ -284,7 +284,7 @@
         "MVP-012": false,
         "MVP-013": false
       },
-      "reviewed_at": "2026-05-27T04:13:45",
+      "reviewed_at": "2026-05-27T04:14:19",
       "reviewer": "javokhir@stanford.edu",
       "reviewer_name": "Javokhir B Arifov"
     }
